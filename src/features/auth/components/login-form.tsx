@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,8 @@ export function LoginForm({
   const [clientErrors, setClientErrors] = useState<FieldErrors | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const formSection = useRef<HTMLElement>(null);
+  const submitButton = useRef<HTMLButtonElement>(null);
 
   const fieldErrors = clientErrors ?? (state && !state.ok ? state.fieldErrors : undefined);
   useFocusFirstError(fieldErrors);
@@ -36,7 +38,7 @@ export function LoginForm({
 
   return (
     <div className="grid items-start gap-6 md:grid-cols-2">
-      <section className="rounded-xl border bg-surface p-8">
+      <section ref={formSection} className="scroll-mt-4 rounded-xl border bg-surface p-8">
         <h1 className="text-3xl font-semibold">Log in</h1>
 
         <form
@@ -93,7 +95,7 @@ export function LoginForm({
             {notice}
           </p>
 
-          <Button type="submit" size="lg" className="w-full" disabled={pending}>
+          <Button ref={submitButton} type="submit" size="lg" className="w-full" disabled={pending}>
             {pending ? "Logging in..." : "Log in"}
           </Button>
         </form>
@@ -113,6 +115,13 @@ export function LoginForm({
           setEmail(account.email);
           setPassword(DEMO_PASSWORD);
           setClientErrors(null);
+          // On a narrow screen the demo list sits below the form: if the form scrolled out of view, bring it back
+          const section = formSection.current;
+          if (section && section.getBoundingClientRect().top < 0) {
+            const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            section.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+          }
+          submitButton.current?.focus({ preventScroll: true });
         }}
       />
     </div>
