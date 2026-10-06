@@ -21,7 +21,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col bg-background text-foreground">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="bottom-right" />
       </body>
