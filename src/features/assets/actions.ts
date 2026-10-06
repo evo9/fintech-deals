@@ -95,3 +95,27 @@ export async function deleteDraftAsset(rawId: unknown): Promise<ActionResult> {
     revalidatePath("/my-assets");
   });
 }
+
+/** PUBLISHED <-> ARCHIVED, owner only. The write is conditional on the status read above. */
+async function moveOwnAsset(rawId: unknown, transition: "withdraw" | "republish", to: "ARCHIVED" | "PUBLISHED") {
+  const user = await requireUser({ roles: ["SELLER"] });
+  const id = assetIdSchema.parse(rawId);
+
+  const asset = await db.asset.findUnique({ where: { id }, select: { id: true, sellerId: true, status: true } });
+  if (!asset || !canManageOwnAsset(user, asset)) throw new ActionError(NOT_FOUND);
+  const blocked = assetTransitionBlockReason(asset, transition);
+  if (blocked) throw new ActionError(blocked);
+
+  const { count } = await db.asset.updateMany({ where: { id, status: asset.status }, data: { status: to } });
+  if (count === 0) throw new ActionError("The asset has changed, reload the page and try again");
+
+  revalidateAsset(id);
+}
+
+export async function withdrawAsset(rawId: unknown): Promise<ActionResult> {
+  return runAction(() => moveOwnAsset(rawId, "withdraw", "ARCHIVED"));
+}
+
+export async function republishAsset(rawId: unknown): Promise<ActionResult> {
+  return runAction(() => moveOwnAsset(rawId, "republish", "PUBLISHED"));
+}
