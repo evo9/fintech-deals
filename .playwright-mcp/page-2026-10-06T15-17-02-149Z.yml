@@ -1,0 +1,26 @@
+- generic [active] [ref=f3e1]:
+  - generic [ref=f3e2]:
+    - banner:
+      - generic [ref=f3e3]:
+        - link "FintechDeeals" [ref=f3e4] [cursor=pointer]:
+          - /url: /assets
+        - generic [ref=f3e5]:
+          - button "Account menu, Lukas Weber" [ref=f3e6]
+          - button "Open menu" [ref=f3e7]
+    - main [ref=f3e9]:
+      - generic [ref=f3e11]:
+        - heading "Assets" [level=1] [ref=f3e12]
+        - generic [ref=f3e13]: Licensed fintech companies and licenses for sale
+      - generic "Loading assets" [ref=f3e14]:
+        - list [ref=f3e24]:
+          - listitem [ref=f3e25]
+          - listitem [ref=f3e27]
+          - listitem [ref=f3e29]
+          - listitem [ref=f3e31]
+          - listitem [ref=f3e33]
+          - listitem [ref=f3e35]
+          - listitem [ref=f3e37]
+          - listitem [ref=f3e39]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=f3e47] [cursor=pointer]
+  - alert [ref=f3e51]

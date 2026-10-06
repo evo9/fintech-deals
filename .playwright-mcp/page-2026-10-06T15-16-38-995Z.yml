@@ -1,0 +1,90 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - banner:
+      - generic [ref=f1e3]:
+        - link "FintechDeeals" [ref=f1e4] [cursor=pointer]:
+          - /url: /assets
+        - generic [ref=f1e5]:
+          - button "Account menu, Lukas Weber" [ref=f1e6]
+          - button "Open menu" [ref=f1e7]
+    - main [ref=f1e9]:
+      - generic [ref=f1e11]:
+        - heading "Assets" [level=1] [ref=f1e12]
+        - generic [ref=f1e13]: Licensed fintech companies and licenses for sale
+      - generic [ref=f1e14]:
+        - generic [ref=f1e15]:
+          - searchbox "Search" [ref=f1e17]: malta
+          - tablist "Category" [ref=f1e20]:
+            - tab "All 6" [selected] [ref=f1e21]:
+              - text: All
+              - generic [ref=f1e22]: "6"
+            - tab "Bank 1" [ref=f1e23]:
+              - text: Bank
+              - generic [ref=f1e24]: "1"
+            - tab "Fintech 0" [ref=f1e25]:
+              - text: Fintech
+              - generic [ref=f1e26]: "0"
+            - tab "Payment 1" [ref=f1e27]:
+              - text: Payment
+              - generic [ref=f1e28]: "1"
+            - tab "EMI 2" [ref=f1e29]:
+              - text: EMI
+              - generic [ref=f1e30]: "2"
+            - tab "Crypto 2" [ref=f1e31]:
+              - text: Crypto
+              - generic [ref=f1e32]: "2"
+        - generic [ref=f1e33]:
+          - paragraph [ref=f1e34]: 6 assets
+          - button "Clear filters" [ref=f1e35]
+          - generic [ref=f1e36]:
+            - button "Filters" [ref=f1e37]
+            - combobox "Sort by" [ref=f1e38]:
+              - generic [ref=f1e39]: Newest
+              - img [aria-hidden]: ▼
+            - textbox [aria-hidden] [ref=f1e40]: newest
+      - list [ref=f1e42]:
+        - listitem [ref=f1e43]:
+          - generic [ref=f1e51]:
+            - paragraph [ref=f1e52]: "Asset ID #700"
+            - link "Maltese payment institution with a merchant acquiring portfolio" [ref=f1e53] [cursor=pointer]:
+              - /url: /assets/700
+            - paragraph [ref=f1e54]: Malta
+          - paragraph [ref=f1e55]: €3.8M
+        - listitem [ref=f1e56]:
+          - generic [ref=f1e64]:
+            - paragraph [ref=f1e65]: "Asset ID #701"
+            - link "Malta EMI with prepaid card programme and BIN sponsorship" [ref=f1e66] [cursor=pointer]:
+              - /url: /assets/701
+            - paragraph [ref=f1e67]: Malta
+          - paragraph [ref=f1e68]: €9.5M
+        - listitem [ref=f1e69]:
+          - generic [ref=f1e77]:
+            - paragraph [ref=f1e78]: "Asset ID #702"
+            - link "MFSA-registered VASP licence, never operated" [ref=f1e79] [cursor=pointer]:
+              - /url: /assets/702
+            - paragraph [ref=f1e80]: Malta
+          - paragraph [ref=f1e81]: €1.2M
+        - listitem [ref=f1e82]:
+          - generic [ref=f1e90]:
+            - paragraph [ref=f1e91]: "Asset ID #705"
+            - link "Dormant Malta EMI with existing safeguarding arrangements" [ref=f1e92] [cursor=pointer]:
+              - /url: /assets/705
+            - paragraph [ref=f1e93]: Malta
+          - paragraph [ref=f1e94]: €5.2M
+        - listitem [ref=f1e95]:
+          - generic [ref=f1e103]:
+            - paragraph [ref=f1e104]: "Asset ID #706"
+            - link "Maltese credit institution with a retail deposit base" [ref=f1e105] [cursor=pointer]:
+              - /url: /assets/706
+            - paragraph [ref=f1e106]: Malta
+          - paragraph [ref=f1e107]: €25M
+        - listitem [ref=f1e108]:
+          - generic [ref=f1e116]:
+            - paragraph [ref=f1e117]: "Asset ID #707"
+            - link "Crypto exchange with a MiCA-ready Maltese entity" [ref=f1e118] [cursor=pointer]:
+              - /url: /assets/707
+            - paragraph [ref=f1e119]: Malta
+          - paragraph [ref=f1e120]: On request
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=f1e126] [cursor=pointer]
+  - alert [ref=f1e130]

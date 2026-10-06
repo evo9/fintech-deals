@@ -1,0 +1,60 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e2]:
+    - banner:
+      - generic [ref=f2e3]:
+        - link "FintechDeeals" [ref=f2e4] [cursor=pointer]:
+          - /url: /assets
+        - navigation "Main" [ref=f2e5]:
+          - link "Assets" [ref=f2e6] [cursor=pointer]:
+            - /url: /assets
+          - link "My profile" [ref=f2e7] [cursor=pointer]:
+            - /url: /profile
+          - link "Messages" [ref=f2e8] [cursor=pointer]:
+            - /url: /messages
+        - generic [ref=f2e9]:
+          - generic [ref=f2e10]: Buyer
+          - button "Account menu, Lukas Weber" [ref=f2e11]:
+            - generic [ref=f2e12]: Lukas Weber
+    - main [ref=f2e14]:
+      - generic [ref=f2e16]:
+        - heading "Assets" [level=1] [ref=f2e17]
+        - generic [ref=f2e18]: Licensed fintech companies and licenses for sale
+      - generic [ref=f2e19]:
+        - generic [ref=f2e20]:
+          - searchbox "Search" [ref=f2e22]: zzzz
+          - tablist "Category" [ref=f2e25]:
+            - tab "All 0" [selected] [ref=f2e26]:
+              - text: All
+              - generic [ref=f2e27]: "0"
+            - tab "Bank 0" [ref=f2e28]:
+              - text: Bank
+              - generic [ref=f2e29]: "0"
+            - tab "Fintech 0" [ref=f2e30]:
+              - text: Fintech
+              - generic [ref=f2e31]: "0"
+            - tab "Payment 0" [ref=f2e32]:
+              - text: Payment
+              - generic [ref=f2e33]: "0"
+            - tab "EMI 0" [ref=f2e34]:
+              - text: EMI
+              - generic [ref=f2e35]: "0"
+            - tab "Crypto 0" [ref=f2e36]:
+              - text: Crypto
+              - generic [ref=f2e37]: "0"
+        - generic [ref=f2e38]:
+          - paragraph [ref=f2e39]: 0 assets
+          - button "Clear filters" [ref=f2e40]
+          - generic [ref=f2e41]:
+            - button "Filters" [ref=f2e42]
+            - combobox "Sort by" [ref=f2e43]:
+              - generic [ref=f2e44]: Newest
+              - img [aria-hidden]: ▼
+            - textbox [aria-hidden] [ref=f2e45]: newest
+      - generic [ref=f2e47]:
+        - heading "No assets match these filters." [level=2] [ref=f2e48]
+        - generic [ref=f2e49]: Try a wider search or remove some filters.
+        - link "Clear filters" [ref=f2e51] [cursor=pointer]:
+          - /url: /assets
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=f2e57] [cursor=pointer]
+  - alert [ref=f2e61]

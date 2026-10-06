@@ -67,6 +67,7 @@ export function FilterBar({
   filterKeys,
   hasActiveFilters,
   search,
+  controls,
   children,
 }: {
   total: number;
@@ -76,6 +77,8 @@ export function FilterBar({
   filterKeys: string[];
   hasActiveFilters: boolean;
   search?: { initialQ: string; placeholder: string };
+  /** Right side of the count row: filter button, sort. */
+  controls?: ReactNode;
   children?: ReactNode;
 }) {
   const { update } = useListState();
@@ -86,8 +89,8 @@ export function FilterBar({
         {search && <SearchInput initialQ={search.initialQ} placeholder={search.placeholder} />}
         {children}
       </div>
-      <div className="mt-4 flex h-9 items-center gap-3">
-        <p aria-live="polite" className="text-sm text-text-muted tabular-nums">
+      <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 sm:h-10 sm:flex-nowrap">
+        <p aria-live="polite" className="flex h-9 items-center text-sm whitespace-nowrap text-text-muted tabular-nums">
           {total} {total === 1 ? singular : plural}
         </p>
         {hasActiveFilters && (
@@ -99,6 +102,7 @@ export function FilterBar({
             Clear filters
           </Button>
         )}
+        {controls && <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">{controls}</div>}
       </div>
     </div>
   );
