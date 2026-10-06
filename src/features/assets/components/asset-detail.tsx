@@ -15,7 +15,10 @@ import {
   LICENSE_TYPE_LABELS,
   countryName,
 } from "@/lib/reference";
+import { MatchCriteria } from "@/features/matching/components/match-criteria";
+import { isShown, isStrongMatch, type MatchResult } from "@/features/matching/score";
 import type { AssetDetail } from "../queries";
+import { OwnerActions } from "./owner-actions";
 
 const NOT_SPECIFIED = "Not specified";
 
@@ -104,7 +107,15 @@ export function AssetMain({ asset, showStatus }: { asset: AssetDetail; showStatu
 }
 
 /** Right column (sticky on desktop): price, seller and the actions of the viewer's role. */
-export function AssetSidebar({ asset, viewer }: { asset: AssetDetail; viewer: SessionUser }) {
+export function AssetSidebar({
+  asset,
+  viewer,
+  match,
+}: {
+  asset: AssetDetail;
+  viewer: SessionUser;
+  match: MatchResult | null;
+}) {
   const isOwner = canManageOwnAsset(viewer, asset);
   const sellerName = asset.seller.companyName?.trim() || asset.seller.name;
 
@@ -126,10 +137,23 @@ export function AssetSidebar({ asset, viewer }: { asset: AssetDetail; viewer: Se
         )}
       </div>
 
+      {viewer.role === "BUYER" && isShown(match) && <MatchBlock match={match} />}
       {viewer.role === "BUYER" && <BuyerActions suspended={viewer.status === "SUSPENDED"} />}
-      {viewer.role === "SELLER" && asset.sellerId === viewer.id && <OwnerActions asset={asset} canManage={isOwner} />}
+      {viewer.role === "SELLER" && asset.sellerId === viewer.id && <OwnerActionsBlock asset={asset} canManage={isOwner} suspended={viewer.status === "SUSPENDED"} />}
       {viewer.role === "MANAGER" && <ManagerActions asset={asset} />}
     </aside>
+  );
+}
+
+/** How the asset fits the buyer's interests; hidden when they have set none. */
+function MatchBlock({ match }: { match: MatchResult }) {
+  return (
+    <div className="flex flex-col gap-2 border-t pt-4 text-sm">
+      <p className="font-semibold">
+        {isStrongMatch(match) ? "Strong match" : `Matches ${match.matched} of ${match.considered} of your criteria`}
+      </p>
+      <MatchCriteria match={match} />
+    </div>
   );
 }
 
@@ -160,33 +184,18 @@ function StatusBlock({ asset }: { asset: AssetDetail }) {
   );
 }
 
-// The buttons below are placeholders with their final layout: the actions are wired in 5.3 (seller)
-// and 7.1 (manager).
-function OwnerActions({ asset, canManage }: { asset: AssetDetail; canManage: boolean }) {
+function OwnerActionsBlock({ asset, canManage, suspended }: { asset: AssetDetail; canManage: boolean; suspended: boolean }) {
   return (
     <>
       <StatusBlock asset={asset} />
-      {canManage && (
-        <div className="flex flex-col gap-2">
-          <Button type="button" variant="outline" disabled className="h-10 border-primary text-primary">
-            Edit
-          </Button>
-          {asset.status === "PUBLISHED" && (
-            <Button type="button" variant="outline" disabled className="h-10">
-              Withdraw
-            </Button>
-          )}
-          {asset.status === "ARCHIVED" && (
-            <Button type="button" disabled className="h-10">
-              Republish
-            </Button>
-          )}
-        </div>
+      {canManage && asset.status !== "REMOVED" && (
+        <OwnerActions id={asset.id} status={asset.status} suspended={suspended} />
       )}
     </>
   );
 }
 
+// The manager buttons are placeholders with their final layout: wired in 7.1.
 function ManagerActions({ asset }: { asset: AssetDetail }) {
   return (
     <>

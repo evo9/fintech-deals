@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useFocusFirstError } from "@/components/shared/use-focus-first-error";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { COUNTRIES } from "@/lib/reference";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ export function RegisterForm() {
   const [country, setCountry] = useState("");
 
   const errors = clientErrors ?? (state && !state.ok ? state.fieldErrors : undefined);
+  useFocusFirstError(errors);
   const formError = !clientErrors && state && !state.ok && !state.fieldErrors ? state.error : null;
 
   return (

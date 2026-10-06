@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useFocusFirstError } from "@/components/shared/use-focus-first-error";
 import { login } from "../actions";
 import type { DemoAccount } from "../queries";
 import { formDataToLogin, loginSchema } from "../schema";
@@ -29,6 +30,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
 
   const fieldErrors = clientErrors ?? (state && !state.ok ? state.fieldErrors : undefined);
+  useFocusFirstError(fieldErrors);
   const formError = !clientErrors && state && !state.ok && !state.fieldErrors ? state.error : null;
   const notice = formError ?? (removed ? "This account has been removed from the platform." : null);
 

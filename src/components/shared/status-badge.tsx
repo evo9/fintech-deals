@@ -15,7 +15,7 @@ const VARIANT: Record<Status, "success" | "warning" | "destructive" | "secondary
   ARCHIVED: "outline",
 };
 
-/** Status of a user (Active, Suspended, Removed) or an asset (Draft, Published, Archived, Removed). */
+/** Status of a user (Active, Suspended, Removed) or an asset (Draft, Published, Withdrawn, Removed). */
 export function StatusBadge({ status, className }: { status: Status; className?: string }) {
   return (
     <Badge variant={VARIANT[status]} className={className}>

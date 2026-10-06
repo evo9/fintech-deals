@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
-import { Prisma, type AssetCategory } from "@prisma/client";
+import { Prisma, type AssetCategory, type AssetStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, toSkipTake } from "@/lib/pagination";
 import { COUNTRIES } from "@/lib/reference";
@@ -8,10 +8,19 @@ import {
   assetVisibilityWhere,
   canViewAsset,
   catalogAssetsWhere,
+  ownAssetsWhere,
   withVisibility,
 } from "@/features/access/visibility";
 import type { SessionUser } from "@/features/auth/session";
-import type { AssetListParams } from "./schema";
+import { getBuyerInterests } from "@/features/buyers/queries";
+import {
+  compareByMatch,
+  hasInterests,
+  scoreMatch,
+  type BuyerInterests,
+  type MatchResult,
+} from "@/features/matching/score";
+import type { AssetListParams, MyAssetsParams, MyAssetTab } from "./schema";
 
 const assetCardSelect = {
   id: true,
@@ -32,7 +41,10 @@ const assetCardSelect = {
   sellerId: true,
 } satisfies Prisma.AssetSelect;
 
-export type AssetCard = Prisma.AssetGetPayload<{ select: typeof assetCardSelect }>;
+type AssetCardRow = Prisma.AssetGetPayload<{ select: typeof assetCardSelect }>;
+
+/** Card data plus the match with the viewer's interests (null when they have none). */
+export type AssetCard = AssetCardRow & { match: MatchResult | null };
 
 /** Same shape as the tabs: every category plus the "All" total. */
 export type CategoryCounts = Record<AssetCategory | "ALL", number>;
@@ -76,8 +88,23 @@ function priceWhere(p: AssetListParams): Prisma.AssetWhereInput | null {
   return { OR: [{ askingPrice: range }, ...(p.includeOnRequest ? [{ askingPrice: null }] : [])] };
 }
 
+/** "Only my interests": every criterion the buyer set becomes a filter; a price on request passes the budget. */
+function interestsWhere(i: BuyerInterests): Prisma.AssetWhereInput {
+  const budget: Prisma.IntNullableFilter = {};
+  if (i.budgetMin != null) budget.gte = i.budgetMin;
+  if (i.budgetMax != null) budget.lte = i.budgetMax;
+  const clauses: Prisma.AssetWhereInput[] = [
+    ...(i.countries.length ? [{ country: { in: i.countries } }] : []),
+    ...(i.licenseTypes.length ? [{ licenseType: { in: i.licenseTypes } }] : []),
+    ...(i.categories.length ? [{ category: { in: i.categories } }] : []),
+    ...(i.assetTypes.length ? [{ assetType: { in: i.assetTypes } }] : []),
+    ...(i.budgetMin != null || i.budgetMax != null ? [{ OR: [{ askingPrice: null }, { askingPrice: budget }] }] : []),
+  ];
+  return { AND: clauses };
+}
+
 /** Everything except the category: the tab counters must not depend on the selected tab. */
-async function buildFilters(p: AssetListParams): Promise<Prisma.AssetWhereInput[]> {
+async function buildFilters(p: AssetListParams, interests: BuyerInterests | null): Promise<Prisma.AssetWhereInput[]> {
   const clauses: Array<Prisma.AssetWhereInput | null> = [
     await searchWhere(p.q),
     p.country.length ? { country: { in: p.country } } : null,
@@ -86,7 +113,7 @@ async function buildFilters(p: AssetListParams): Promise<Prisma.AssetWhereInput[
     p.businessStatus.length ? { businessStatus: { in: p.businessStatus } } : null,
     priceWhere(p),
     p.validated ? { validatedAt: { not: null } } : null,
-    // `mine` (only my interests) is wired in with matching, task 4.5
+    p.mine && hasInterests(interests) ? interestsWhere(interests) : null,
   ];
   return clauses.filter((c): c is Prisma.AssetWhereInput => c !== null);
 }
@@ -106,18 +133,22 @@ function assetOrderBy(sort: AssetListParams["sort"]): Prisma.AssetOrderByWithRel
 export async function listCatalogAssets(viewer: SessionUser, p: AssetListParams) {
   if (viewer.role !== "BUYER") notFound();
 
-  const filters = await buildFilters(p);
+  const interests = await getBuyerInterests(viewer.id);
+  const interestsSet = hasInterests(interests);
+  const filters = await buildFilters(p, interests);
   const tabsWhere = withVisibility(catalogAssetsWhere, { AND: filters });
   const listWhere = withVisibility(catalogAssetsWhere, {
     AND: p.category ? [...filters, { category: p.category }] : filters,
   });
+  // "Best match" sorts in memory over the whole filtered set (a prototype shortcut, see README)
+  const bestMatch = p.sort === "best_match" && interestsSet;
 
   // Array transaction (one round trip): an interactive one needs its own connection and times out on the pooler
-  const [items, grouped] = await db.$transaction([
+  const [rows, grouped] = await db.$transaction([
     db.asset.findMany({
       where: listWhere,
-      orderBy: assetOrderBy(p.sort),
-      ...toSkipTake(p.page, PAGE_SIZE.cards),
+      orderBy: assetOrderBy(bestMatch ? "newest" : p.sort),
+      ...(bestMatch ? {} : toSkipTake(p.page, PAGE_SIZE.cards)),
       select: assetCardSelect,
     }),
     db.asset.groupBy({
@@ -135,7 +166,13 @@ export async function listCatalogAssets(viewer: SessionUser, p: AssetListParams)
     counts[row.category] = n;
     counts.ALL += n;
   }
-  return { items, total: p.category ? counts[p.category] : counts.ALL, counts };
+
+  let items: AssetCard[] = rows.map((r) => ({ ...r, match: interestsSet ? scoreMatch(r, interests) : null }));
+  if (bestMatch) {
+    const { skip, take } = toSkipTake(p.page, PAGE_SIZE.cards);
+    items = items.sort(compareByMatch).slice(skip, skip + take);
+  }
+  return { items, total: p.category ? counts[p.category] : counts.ALL, counts, hasInterests: interestsSet };
 }
 
 const assetDetailSelect = {
@@ -176,3 +213,74 @@ export const getAssetForViewer = cache(async (viewer: SessionUser, rawId: string
   if (!asset || !canViewAsset(viewer, asset)) notFound();
   return asset;
 });
+
+const myAssetSelect = {
+  id: true,
+  headline: true,
+  category: true,
+  askingPrice: true,
+  status: true,
+  updatedAt: true,
+  _count: { select: { conversations: true } },
+} satisfies Prisma.AssetSelect;
+
+export type MyAssetRow = Prisma.AssetGetPayload<{ select: typeof myAssetSelect }>;
+export type MyAssetCounts = Record<MyAssetTab, number>;
+
+/** "My assets" of a seller: own assets in every status, tab counters for all statuses. */
+export async function listOwnAssets(viewer: SessionUser, p: MyAssetsParams) {
+  if (viewer.role !== "SELLER") notFound();
+
+  const own = ownAssetsWhere(viewer);
+  const where = p.status === "ALL" ? own : withVisibility(own, { status: p.status as AssetStatus });
+
+  const [items, grouped] = await db.$transaction([
+    db.asset.findMany({
+      where,
+      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+      ...toSkipTake(p.page, PAGE_SIZE.rows),
+      select: myAssetSelect,
+    }),
+    db.asset.groupBy({ by: ["status"], where: own, _count: { _all: true }, orderBy: { status: "asc" } }),
+  ]);
+
+  const counts: MyAssetCounts = { ALL: 0, PUBLISHED: 0, DRAFT: 0, ARCHIVED: 0, REMOVED: 0 };
+  for (const row of grouped) {
+    const n = typeof row._count === "object" ? (row._count._all ?? 0) : 0;
+    counts[row.status] = n;
+    counts.ALL += n;
+  }
+  return { items, total: counts[p.status], counts };
+}
+
+const assetEditSelect = {
+  id: true,
+  sellerId: true,
+  headline: true,
+  category: true,
+  licenseType: true,
+  assetType: true,
+  businessStatus: true,
+  country: true,
+  regulator: true,
+  yearOfIssue: true,
+  employees: true,
+  askingPrice: true,
+  included: true,
+  description: true,
+  status: true,
+  removedReason: true,
+} satisfies Prisma.AssetSelect;
+
+export type AssetForEdit = Prisma.AssetGetPayload<{ select: typeof assetEditSelect }>;
+
+/** Asset for the edit form: only the owner's own asset (a REMOVED one is shown read-only); anything else is a 404. */
+export async function getOwnAssetForEdit(viewer: SessionUser, rawId: string): Promise<AssetForEdit> {
+  if (viewer.role !== "SELLER" || !/^\d{1,9}$/.test(rawId)) notFound();
+  const asset = await db.asset.findFirst({
+    where: withVisibility(ownAssetsWhere(viewer), { id: Number(rawId) }),
+    select: assetEditSelect,
+  });
+  if (!asset) notFound();
+  return asset;
+}

@@ -18,7 +18,7 @@ export default async function AssetsPage({ searchParams }: Props) {
   const raw = await searchParams;
   const user = await requireUser({ roles: ["BUYER"], allowSuspended: true, next: "/assets" });
   const params = assetListParams.parse(raw);
-  const { items, total, counts } = await listCatalogAssets(user, params);
+  const { items, total, counts, hasInterests } = await listCatalogAssets(user, params);
 
   const pages = totalPages(total, PAGE_SIZE.cards);
   if (params.page > pages) redirect(`/assets?${withPage(raw, pages)}`.replace(/\?$/, ""));
@@ -27,7 +27,7 @@ export default async function AssetsPage({ searchParams }: Props) {
     <main className="mx-auto w-full max-w-[1280px] px-4 py-8">
       <PageHeader title="Assets" description="Licensed fintech companies and licenses for sale" />
       <ListStateProvider>
-        <AssetFilters params={params} total={total} counts={counts} />
+        <AssetFilters params={params} total={total} counts={counts} hasInterests={hasInterests} />
         <ListBody className="mt-4">
           {items.length ? (
             <ul className="flex flex-col gap-4">
@@ -36,7 +36,22 @@ export default async function AssetsPage({ searchParams }: Props) {
               ))}
             </ul>
           ) : (
-            <EmptyState title="No assets match these filters." description="Try a wider search or remove some filters.">
+            <EmptyState
+              title="No assets match these filters."
+              description={
+                params.mine && hasInterests ? (
+                  <>
+                    Try widening your interests in{" "}
+                    <Link href="/profile" className="font-medium text-primary hover:underline">
+                      your profile
+                    </Link>
+                    , or remove some filters.
+                  </>
+                ) : (
+                  "Try a wider search or remove some filters."
+                )
+              }
+            >
               <Link href="/assets" className={buttonVariants({ variant: "secondary" })}>
                 Clear filters
               </Link>

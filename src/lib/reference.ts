@@ -96,7 +96,7 @@ export const BUSINESS_STATUS_LABELS = {
 export const ASSET_STATUS_LABELS = {
   DRAFT: "Draft",
   PUBLISHED: "Published",
-  ARCHIVED: "Archived",
+  ARCHIVED: "Withdrawn",
   REMOVED: "Removed",
 } satisfies Record<AssetStatus, string>;
 

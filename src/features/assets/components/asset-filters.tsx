@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Sheet,
@@ -33,17 +34,19 @@ import { cn } from "@/lib/utils";
 import { DEFAULT_ASSET_SORT, type AssetListParams } from "../schema";
 import type { CategoryCounts } from "../queries";
 
-const SORT_OPTIONS = [
+const BASE_SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
   { value: "price_asc", label: "Price: low to high" },
   { value: "price_desc", label: "Price: high to low" },
 ];
+// Best match makes sense only when the buyer has set interests
+const SORT_OPTIONS = [...BASE_SORT_OPTIONS, { value: "best_match", label: "Best match" }];
 
 const EU_CODES = COUNTRIES.filter((c) => c.eu).map((c) => c.code);
 
 // Everything the Filters panel owns (the search box, tabs and sort have their own controls).
 const PANEL_KEYS = ["country", "licenseType", "assetType", "businessStatus", "priceMin", "priceMax", "includeOnRequest", "validated"];
-const ALL_KEYS = ["q", "category", ...PANEL_KEYS, "sort"];
+const ALL_KEYS = ["q", "category", ...PANEL_KEYS, "mine", "sort"];
 
 function panelCount(p: AssetListParams) {
   return (
@@ -60,15 +63,21 @@ export function AssetFilters({
   params,
   total,
   counts,
+  hasInterests,
 }: {
   params: AssetListParams;
   total: number;
   counts: CategoryCounts;
+  hasInterests: boolean;
 }) {
   const { update } = useListState();
   const activeInPanel = panelCount(params);
+  const sortOptions = hasInterests ? SORT_OPTIONS : BASE_SORT_OPTIONS;
+  const sort = sortOptions.some((o) => o.value === params.sort) ? params.sort : DEFAULT_ASSET_SORT;
+  const mine = params.mine && hasInterests;
   const hasActiveFilters =
-    activeInPanel > 0 || params.q !== "" || params.category !== undefined || params.sort !== DEFAULT_ASSET_SORT;
+    mine ||
+    activeInPanel > 0 || params.q !== "" || params.category !== undefined || sort !== DEFAULT_ASSET_SORT;
 
   return (
     <FilterBar
@@ -80,17 +89,18 @@ export function AssetFilters({
       search={{ initialQ: params.q, placeholder: "Find an asset..." }}
       controls={
         <>
-          <FiltersPanel params={params} activeCount={activeInPanel} />
+          <MyInterestsToggle checked={mine} hasInterests={hasInterests} className="hidden md:flex" />
+          <FiltersPanel params={params} activeCount={activeInPanel} hasInterests={hasInterests} />
           <Select
-            value={params.sort}
-            items={SORT_OPTIONS}
+            value={sort}
+            items={sortOptions}
             onValueChange={(v) => update({ sort: v === DEFAULT_ASSET_SORT ? null : v })}
           >
             <SelectTrigger aria-label="Sort by" className="min-w-0 flex-1 sm:w-48 sm:flex-none">
               <SelectValue />
             </SelectTrigger>
             <SelectContent alignItemWithTrigger={false} align="end">
-              {SORT_OPTIONS.map((o) => (
+              {sortOptions.map((o) => (
                 <SelectItem key={o.value} value={o.value}>
                   {o.label}
                 </SelectItem>
@@ -114,6 +124,32 @@ export function AssetFilters({
   );
 }
 
+/** "Only my interests": the buyer's profile applied as filters. Disabled until interests are set. */
+function MyInterestsToggle({
+  checked,
+  hasInterests,
+  className,
+}: {
+  checked: boolean;
+  hasInterests: boolean;
+  className?: string;
+}) {
+  const { update } = useListState();
+  return (
+    <Label
+      title={hasInterests ? undefined : "Add interests in your profile to use this"}
+      className={cn("h-10 shrink-0 cursor-pointer items-center gap-2 px-1 font-normal", !hasInterests && "cursor-not-allowed opacity-60", className)}
+    >
+      <Switch
+        checked={checked}
+        disabled={!hasInterests}
+        onCheckedChange={(v) => update({ mine: v ? "1" : null })}
+      />
+      Only my interests
+    </Label>
+  );
+}
+
 function CategoryTab({ value, label, count }: { value: string; label: string; count: number }) {
   return (
     <TabsTrigger value={value} className="gap-0.5 px-[3px] text-xs sm:gap-1.5 sm:px-4 sm:text-sm">
@@ -124,7 +160,15 @@ function CategoryTab({ value, label, count }: { value: string; label: string; co
 }
 
 /** Popover on desktop, Sheet on mobile; both hold the same form with an explicit Apply. */
-function FiltersPanel({ params, activeCount }: { params: AssetListParams; activeCount: number }) {
+function FiltersPanel({
+  params,
+  activeCount,
+  hasInterests,
+}: {
+  params: AssetListParams;
+  activeCount: number;
+  hasInterests: boolean;
+}) {
   const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const label = (
@@ -155,7 +199,7 @@ function FiltersPanel({ params, activeCount }: { params: AssetListParams; active
             <SheetTitle>Filters</SheetTitle>
             <SheetDescription className="sr-only">Narrow down the asset list</SheetDescription>
           </SheetHeader>
-          <FiltersForm params={params} onDone={() => setMobileOpen(false)} className="min-h-0 flex-1" />
+          <FiltersForm params={params} showInterests hasInterests={hasInterests} onDone={() => setMobileOpen(false)} className="min-h-0 flex-1" />
         </SheetContent>
       </Sheet>
     </>
@@ -169,10 +213,15 @@ function toggle<T>(list: T[], value: T): T[] {
 /** Draft state lives here; the URL changes only on Apply / Reset. Mounted only while the panel is open. */
 function FiltersForm({
   params,
+  showInterests = false,
+  hasInterests = false,
   onDone,
   className,
 }: {
   params: AssetListParams;
+  /** True only in the mobile sheet: on desktop the toggle sits in the controls row. */
+  showInterests?: boolean;
+  hasInterests?: boolean;
   onDone: () => void;
   className?: string;
 }) {
@@ -220,6 +269,9 @@ function FiltersForm({
       }}
     >
       <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-4">
+        {showInterests && (
+          <MyInterestsToggle checked={params.mine && hasInterests} hasInterests={hasInterests} className="flex" />
+        )}
         <Group
           title="Country"
           action={
