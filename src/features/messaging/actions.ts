@@ -13,7 +13,16 @@ import {
   withVisibility,
 } from "@/features/access/visibility";
 import { requireUser } from "@/features/auth/guards";
-import { formDataToStartConversation, startConversationSchema } from "./schema";
+import { MESSAGES_PAGE } from "@/lib/pagination";
+import { canSendMessage } from "@/features/access/visibility";
+import { canViewConversation } from "@/features/access/visibility";
+import {
+  formDataToStartConversation,
+  loadEarlierSchema,
+  sendMessageSchema,
+  startConversationSchema,
+} from "./schema";
+import type { ThreadMessage } from "./queries";
 
 export type StartedConversation = { conversationId: string };
 
@@ -112,5 +121,85 @@ export async function startConversation(
 
     revalidatePath("/messages");
     return { conversationId: conversation.id };
+  });
+}
+
+const NOT_FOUND_CONVERSATION = "Conversation not found";
+
+/** A message into an existing conversation. The sender comes from the session, the counterpart is re-read. */
+export async function sendMessage(rawConversationId: unknown, rawBody: unknown): Promise<ActionResult<ThreadMessage>> {
+  return runAction(async () => {
+    const user = await requireUser({ roles: ["BUYER", "SELLER"] });
+    const input = sendMessageSchema.parse({ conversationId: rawConversationId, body: rawBody });
+
+    const conversation = await db.conversation.findUnique({
+      where: { id: input.conversationId },
+      select: {
+        id: true,
+        buyerId: true,
+        sellerId: true,
+        buyer: { select: { id: true, role: true, status: true } },
+        seller: { select: { id: true, role: true, status: true } },
+      },
+    });
+    if (!conversation || !canViewConversation(user, conversation)) throw new ActionError(NOT_FOUND_CONVERSATION);
+    const counterpart = conversation.buyerId === user.id ? conversation.seller : conversation.buyer;
+    const check = canSendMessage(user, conversation, counterpart);
+    if (!check.ok) throw new ActionError(check.notFound ? NOT_FOUND_CONVERSATION : check.reason);
+
+    const now = new Date();
+    const message = await db.$transaction(
+      async (tx) => {
+        // the check above ran a moment ago: re-read the other side before writing
+        const other = await tx.user.findUnique({ where: { id: counterpart.id }, select: { status: true } });
+        const paused = other ? participantPausedReason(other.status) : NOT_FOUND_CONVERSATION;
+        if (paused) throw new ActionError(paused);
+
+        const created = await tx.message.create({
+          data: { conversationId: conversation.id, senderId: user.id, body: input.body },
+          select: { id: true, senderId: true, body: true, createdAt: true },
+        });
+        await tx.conversation.update({
+          where: { id: conversation.id },
+          data: { lastMessageAt: now, ...(user.id === conversation.buyerId ? { buyerLastReadAt: now } : { sellerLastReadAt: now }) },
+        });
+        return created;
+      },
+      { maxWait: 10_000, timeout: 15_000 },
+    );
+
+    revalidatePath("/messages");
+    return { id: message.id, senderId: message.senderId, body: message.body, createdAt: message.createdAt.toISOString() };
+  });
+}
+
+/** "Load earlier messages": the 30 messages before `before`, participants only. Read-only, so a suspended user may call it. */
+export async function loadEarlierMessages(
+  rawConversationId: unknown,
+  rawBefore: unknown,
+): Promise<ActionResult<{ messages: ThreadMessage[]; hasMore: boolean }>> {
+  return runAction(async () => {
+    const user = await requireUser({ roles: ["BUYER", "SELLER"], allowSuspended: true });
+    const input = loadEarlierSchema.parse({ conversationId: rawConversationId, before: rawBefore });
+
+    const conversation = await db.conversation.findUnique({
+      where: { id: input.conversationId },
+      select: { id: true, buyerId: true, sellerId: true },
+    });
+    if (!conversation || !canViewConversation(user, conversation)) throw new ActionError(NOT_FOUND_CONVERSATION);
+
+    const rows = await db.message.findMany({
+      where: { conversationId: conversation.id, createdAt: { lt: new Date(input.before) } },
+      orderBy: { createdAt: "desc" },
+      take: MESSAGES_PAGE + 1,
+      select: { id: true, senderId: true, body: true, createdAt: true },
+    });
+    return {
+      messages: rows
+        .slice(0, MESSAGES_PAGE)
+        .reverse()
+        .map((m) => ({ id: m.id, senderId: m.senderId, body: m.body, createdAt: m.createdAt.toISOString() })),
+      hasMore: rows.length > MESSAGES_PAGE,
+    };
   });
 }

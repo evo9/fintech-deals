@@ -43,3 +43,13 @@ export function formDataToStartConversation(formData: FormData) {
     body: text("body"),
   };
 }
+
+export const sendMessageSchema = z.object({
+  conversationId: z.string().trim().min(1).max(40),
+  body: messageBodySchema,
+});
+
+export const loadEarlierSchema = z.object({
+  conversationId: z.string().trim().min(1).max(40),
+  before: z.iso.datetime({ message: "Invalid date" }),
+});

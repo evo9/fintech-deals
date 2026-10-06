@@ -39,3 +39,9 @@ export function withPage(params: RawParams, page: number): string {
   if (page > 1) next.set("page", String(page));
   return next.toString();
 }
+
+/** `?page=` from the URL as a safe positive integer: junk, fractions and huge values fall back to 1..100000. */
+export function parsePage(value: string | string[] | undefined): number {
+  const n = Math.trunc(Number(typeof value === "string" ? value : 1));
+  return Number.isFinite(n) ? Math.max(1, Math.min(100_000, n)) : 1;
+}
