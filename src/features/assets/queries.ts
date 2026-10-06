@@ -58,8 +58,8 @@ async function idsMatchingIncluded(text: string): Promise<number[]> {
   return rows.map((r) => r.id);
 }
 
-/** Search: asset ID, headline, description, country, regulator, included. */
-async function searchWhere(q: string): Promise<Prisma.AssetWhereInput | null> {
+/** Search: asset ID, headline, description, country, regulator, included. No visibility inside: the caller applies it or checks the role. */
+export async function searchWhere(q: string): Promise<Prisma.AssetWhereInput | null> {
   if (!q) return null;
   const id = /^#?(\d{1,9})$/.exec(q);
   const needle = q.toLowerCase();

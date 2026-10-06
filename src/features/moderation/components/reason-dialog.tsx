@@ -107,7 +107,7 @@ export function ReasonDialog({
               setError(null);
             }}
           />
-          <p id={errorId} role={error ? "alert" : undefined} className="min-h-5 text-sm text-danger">
+          <p id={errorId} role={error ? "alert" : undefined} className="min-h-5 text-sm text-danger-text">
             {error}
           </p>
         </div>

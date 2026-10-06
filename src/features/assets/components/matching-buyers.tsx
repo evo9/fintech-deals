@@ -16,6 +16,9 @@ export function MatchingBuyers({ buyers }: { buyers: MatchingBuyer[] }) {
         <p className="mt-3 flex items-center gap-2 text-sm text-text-muted">
           <UsersIcon aria-hidden className="size-4" />
           No buyers match this asset yet.
+          <Link href="/buyers" className="font-semibold text-primary hover:underline">
+            Browse buyers
+          </Link>
         </p>
       ) : (
         <ul className="mt-3 flex flex-col divide-y">

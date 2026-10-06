@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { AssetCategory, AssetType, BuyerType, LicenseType } from "@prisma/client";
 import { COUNTRIES } from "@/lib/reference";
-import { csvOf, euros, intField } from "@/features/assets/schema";
+import { csvOf, euros, intField, swapRange } from "@/features/assets/schema";
 
 /** URL state of the buyers catalog (`/buyers`). Invalid values fall back to defaults instead of throwing. */
 export const buyerListParams = z.object({
@@ -15,7 +15,7 @@ export const buyerListParams = z.object({
   /** "Match against": id of one of the seller's own assets. */
   asset: z.coerce.number().int().min(1).max(999_999_999).optional().catch(undefined),
   page: z.coerce.number().int().min(1).max(100_000).catch(1),
-});
+}).transform(swapRange("budgetMin", "budgetMax"));
 export type BuyerListParams = z.infer<typeof buyerListParams>;
 
 // ---------- own profile (buyer): shared by the form and the action ----------

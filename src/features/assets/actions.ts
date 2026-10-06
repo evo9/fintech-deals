@@ -12,6 +12,14 @@ export type SavedAsset = { id: number; status: "DRAFT" | "PUBLISHED" | "ARCHIVED
 
 const NOT_FOUND = "Asset not found"; // same text for "missing" and "not yours"
 
+/** The owner of a REMOVED asset gets the real reason; everyone else the neutral "not found". */
+function ownershipError(user: { id: string }, asset: { sellerId: string; status: string } | null) {
+  if (asset && asset.sellerId === user.id && asset.status === "REMOVED") {
+    return new ActionError("Removed assets cannot be changed");
+  }
+  return new ActionError(NOT_FOUND);
+}
+
 function revalidateAsset(id: number) {
   revalidatePath("/my-assets");
   revalidatePath("/assets");
@@ -52,7 +60,7 @@ export async function updateAsset(_prev: ActionResult<SavedAsset> | null, formDa
     const intent = assetIntentSchema.parse(formData.get("intent"));
 
     const asset = await db.asset.findUnique({ where: { id }, select: { id: true, sellerId: true, status: true } });
-    if (!asset || !canManageOwnAsset(user, asset)) throw new ActionError(NOT_FOUND);
+    if (!asset || !canManageOwnAsset(user, asset)) throw ownershipError(user, asset);
 
     if (asset.status === "DRAFT") {
       if (intent === "save") throw new ActionError("Save the draft or publish it");
@@ -86,7 +94,7 @@ export async function deleteDraftAsset(rawId: unknown): Promise<ActionResult> {
     const id = assetIdSchema.parse(rawId);
 
     const asset = await db.asset.findUnique({ where: { id }, select: { id: true, sellerId: true, status: true } });
-    if (!asset || !canManageOwnAsset(user, asset)) throw new ActionError(NOT_FOUND);
+    if (!asset || !canManageOwnAsset(user, asset)) throw ownershipError(user, asset);
     const blocked = assetTransitionBlockReason(asset, "delete");
     if (blocked) throw new ActionError(blocked);
 
@@ -102,7 +110,7 @@ async function moveOwnAsset(rawId: unknown, transition: "withdraw" | "republish"
   const id = assetIdSchema.parse(rawId);
 
   const asset = await db.asset.findUnique({ where: { id }, select: { id: true, sellerId: true, status: true } });
-  if (!asset || !canManageOwnAsset(user, asset)) throw new ActionError(NOT_FOUND);
+  if (!asset || !canManageOwnAsset(user, asset)) throw ownershipError(user, asset);
   const blocked = assetTransitionBlockReason(asset, transition);
   if (blocked) throw new ActionError(blocked);
 

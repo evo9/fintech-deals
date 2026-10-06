@@ -17,6 +17,5 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
   MANAGER: [
     { href: "/admin/users", label: "Participants" },
     { href: "/admin/assets", label: "Assets" },
-    { href: "/admin/log", label: "Moderation log" },
   ],
 };

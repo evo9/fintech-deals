@@ -18,7 +18,7 @@ export default async function ProfilePage() {
         description="Tell sellers what you are looking for"
         actions={
           <div className="lg:hidden">
-            <VisibilityBadge visible={visible} />
+            <VisibilityBadge visible={visible} suspended={user.status === "SUSPENDED"} />
           </div>
         }
       />

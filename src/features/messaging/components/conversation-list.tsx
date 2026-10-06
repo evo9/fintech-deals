@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ListStateProvider } from "@/components/shared/list-state";
+import { ListBody, ListStateProvider } from "@/components/shared/list-state";
 import { Pagination } from "@/components/shared/pagination";
 import { RoleBadge } from "@/components/shared/role-badge";
-import { formatAssetId, formatDate } from "@/lib/format";
+import { formatAssetId, formatDate, formatTime } from "@/lib/format";
 import { USER_STATUS_LABELS } from "@/lib/reference";
 import { PAGE_SIZE, totalPages } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
@@ -22,11 +22,16 @@ export function ConversationList({
 }) {
   const pages = totalPages(total, PAGE_SIZE.rows);
   const suffix = page > 1 ? `?page=${page}` : "";
+  const today = formatDate(new Date());
+  // today's messages show the time, older ones the date
+  const stamp = (d: Date | string) => (formatDate(d) === today ? formatTime(d) : formatDate(d));
 
   return (
+    <ListStateProvider>
     <section aria-label="Conversations" className="flex h-full min-h-0 flex-col rounded-xl border bg-surface">
       <h1 className="shrink-0 border-b px-4 py-3 text-lg font-semibold">Messages</h1>
-      <ul className="min-h-0 flex-1 divide-y overflow-y-auto">
+      <ListBody className="min-h-0 flex-1 overflow-y-auto">
+      <ul className="divide-y">
         {items.map((c) => (
           <li key={c.id}>
             <Link
@@ -39,11 +44,12 @@ export function ConversationList({
             >
               <span className="flex items-center gap-2">
                 <span className="min-w-0 flex-1 truncate font-semibold">{c.counterpart.name}</span>
-                <span className="shrink-0 text-xs text-text-muted tabular-nums">{formatDate(c.lastMessageAt)}</span>
+                <span className="shrink-0 text-xs text-text-muted tabular-nums">{stamp(c.lastMessageAt)}</span>
               </span>
               <span className="flex items-center gap-2 text-sm text-text-muted">
                 <RoleBadge role={c.counterpart.role} className="h-5 shrink-0 px-2" />
                 <span className="truncate">
+                  {c.counterpart.companyName ? `${c.counterpart.companyName} · ` : ""}
                   {c.asset ? `Asset ID ${formatAssetId(c.asset.id)}` : "General"}
                   {c.counterpart.status !== "ACTIVE" && ` · ${USER_STATUS_LABELS[c.counterpart.status]}`}
                 </span>
@@ -55,11 +61,11 @@ export function ConversationList({
           </li>
         ))}
       </ul>
+      </ListBody>
       <div className="shrink-0">
-        <ListStateProvider>
-          <Pagination page={page} pages={pages} />
-        </ListStateProvider>
+        <Pagination page={page} pages={pages} />
       </div>
     </section>
+    </ListStateProvider>
   );
 }

@@ -26,7 +26,7 @@ export function FieldTile({
         className,
       )}
     >
-      <p className="truncate text-[13px] leading-5 text-text-muted">{label}</p>
+      <p className={cn("truncate text-[13px] leading-5 text-text-muted", highlight && "text-foreground/70")}>{label}</p>
       <p
         title={value}
         className={cn(

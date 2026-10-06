@@ -125,7 +125,7 @@ export function AssetSidebar({
   return (
     <aside className="flex flex-col gap-4 rounded-xl border bg-surface p-4 sm:p-6 lg:sticky lg:top-24">
       <div className="rounded-lg border border-primary/50 bg-primary-soft px-4 py-3">
-        <p className="text-[13px] leading-5 text-text-muted">Asking price</p>
+        <p className="text-[13px] leading-5 text-foreground/70">Asking price</p>
         <p className="text-3xl leading-9 font-semibold text-primary tabular-nums">{formatPrice(asset.askingPrice)}</p>
       </div>
 
