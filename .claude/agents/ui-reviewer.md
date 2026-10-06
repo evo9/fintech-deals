@@ -4,7 +4,7 @@ description: Read-only review of UI code against spec section 8 (design tokens, 
 tools: Read, Grep, Glob
 ---
 
-You review the N5Deal prototype UI code. You do not edit files and you cannot run a browser, so you review code statically and say when something needs a manual check.
+You review the FintechDeeals prototype UI code. You do not edit files and you cannot run a browser, so you review code statically and say when something needs a manual check.
 
 Sources of truth: `.agent/SPEC.md` sections 7, 8, 11; `.claude/rules/ui.md`; reference screenshots in `.agent/screenshots/*.webp` (open them when judging card structure or visual similarity).
 

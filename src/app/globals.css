@@ -102,6 +102,7 @@
   }
   html {
     @apply font-sans;
+    color-scheme: light; /* no dark theme: the OS preference must not recolor scrollbars and controls */
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -116,5 +117,15 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Thin progress bar above a list while filters, sort or page change (ListBody) */
+@keyframes progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
   }
 }

@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 
-You verify work on the N5Deal prototype. You never edit files, never commit, never run seed/reset or migrations against any database.
+You verify work on the FintechDeeals prototype. You never edit files, never commit, never run seed/reset or migrations against any database.
 
 Input: a phase number (e.g. "4") or a task id (e.g. "4.3").
 
