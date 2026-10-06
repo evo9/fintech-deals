@@ -13,6 +13,7 @@ import {
   type User,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { DEMO_ACCOUNT_EMAILS } from "../src/features/auth/demo";
 import { defaultRegulator } from "../src/lib/reference";
 
 const db = new PrismaClient();
@@ -29,11 +30,11 @@ const REMOVED_SELLER_REASON = "Repeated violations of marketplace rules";
 const SUSPENDED_BUYER_REASON = "Suspicious activity reported by a seller";
 
 const sellers = [
-  { email: "seller.malta@demo.io", name: "Marco Vella", companyName: "Vella Corporate Services", country: "MT" },
-  { email: "seller.baltic@demo.io", name: "Jonas Petrauskas", companyName: "Baltic License Partners", country: "LT" },
-  { email: "seller.georgia@demo.io", name: "Nino Beridze", companyName: "Caucasus Fintech Holdings", country: "GE" },
-  { email: "seller.cyprus@demo.io", name: "Elena Christou", companyName: "Meridian Advisory", country: "CY", status: "SUSPENDED" as const, statusReason: SUSPENDED_SELLER_REASON, statusChangedAt: daysAgo(9) },
-  { email: "seller.gulf@demo.io", name: "Omar Haddad", companyName: "Gulf Digital Assets", country: "AE", status: "REMOVED" as const, statusReason: REMOVED_SELLER_REASON, statusChangedAt: daysAgo(21) },
+  { email: "seller.malta@example.com", name: "Marco Vella", companyName: "Vella Corporate Services", country: "MT" },
+  { email: "seller.baltic@example.com", name: "Jonas Petrauskas", companyName: "Baltic License Partners", country: "LT" },
+  { email: "seller.georgia@example.com", name: "Nino Beridze", companyName: "Caucasus Fintech Holdings", country: "GE" },
+  { email: "seller.cyprus@example.com", name: "Elena Christou", companyName: "Meridian Advisory", country: "CY", status: "SUSPENDED" as const, statusReason: SUSPENDED_SELLER_REASON, statusChangedAt: daysAgo(9) },
+  { email: "seller.gulf@example.com", name: "Omar Haddad", companyName: "Gulf Digital Assets", country: "AE", status: "REMOVED" as const, statusReason: REMOVED_SELLER_REASON, statusChangedAt: daysAgo(21) },
 ];
 
 type BuyerSeed = {
@@ -59,45 +60,45 @@ type BuyerSeed = {
 
 const buyers: BuyerSeed[] = [
   {
-    email: "lukas.weber@demo.io", name: "Lukas Weber", companyName: "Weber Family Office", country: "IE",
+    email: "lukas.weber@example.com", name: "Lukas Weber", companyName: "Weber Family Office", country: "IE",
     profile: { buyerType: "FAMILY_OFFICE", headline: "Family office seeking regulated payment businesses in the EU", about: "We hold regulated financial infrastructure for the long term and keep existing teams in place. Open to minority and majority stakes.", budgetMin: 2_000_000, budgetMax: 10_000_000, countries: ["MT", "LT", "IE"], licenseTypes: ["PI", "EMI"], categories: ["PAYMENT", "EMI"], assetTypes: ["ACTIVE_BUSINESS"] },
   },
   {
-    email: "sofia.marino@demo.io", name: "Sofia Marino", companyName: "Adriatic Payments Group", country: "CY",
+    email: "sofia.marino@example.com", name: "Sofia Marino", companyName: "Adriatic Payments Group", country: "CY",
     profile: { buyerType: "STRATEGIC", headline: "Strategic acquirer expanding card issuing in the EU", about: "Adriatic Payments operates in six markets and is adding an EU e-money licence to issue cards under our own brand.", budgetMin: 5_000_000, budgetMax: 15_000_000, countries: ["MT", "LT", "CY", "EE"], licenseTypes: ["EMI"], categories: ["EMI", "PAYMENT"], assetTypes: ["ACTIVE_BUSINESS"] },
   },
   {
-    email: "daniel.brooks@demo.io", name: "Daniel Brooks", companyName: "Brooks Digital Ventures", country: "GB",
+    email: "daniel.brooks@example.com", name: "Daniel Brooks", companyName: "Brooks Digital Ventures", country: "GB",
     profile: { buyerType: "FINANCIAL_INVESTOR", headline: "Crypto-focused investor with a licence-first approach", about: "We back founders who need a ready licence to launch a regulated crypto product. We prefer entities without legacy liabilities.", budgetMin: 500_000, budgetMax: 3_000_000, countries: ["MT", "LT", "GE", "AE"], licenseTypes: ["VASP", "CASP"], categories: ["CRYPTO"], assetTypes: ["LICENSE_ONLY", "SHELF_COMPANY"] },
   },
   {
-    email: "amira.khalil@demo.io", name: "Amira Khalil", companyName: "Khalil Capital", country: "AE",
+    email: "amira.khalil@example.com", name: "Amira Khalil", companyName: "Khalil Capital", country: "AE",
     profile: { buyerType: "FINANCIAL_INVESTOR", headline: "Looking for fintech and payment platforms in Georgia and Cyprus", about: "Khalil Capital invests in operating payment businesses with a proven transaction history.", budgetMin: 1_000_000, budgetMax: 5_000_000, countries: ["GE", "CY"], licenseTypes: ["PSP", "PI"], categories: ["FINTECH", "PAYMENT"], assetTypes: [] },
   },
   {
-    email: "tomasz.nowak@demo.io", name: "Tomasz Nowak", companyName: "Nowak Holdings", country: "PL",
+    email: "tomasz.nowak@example.com", name: "Tomasz Nowak", companyName: "Nowak Holdings", country: "PL",
     profile: { buyerType: "STRATEGIC", headline: "Polish group entering licensed payments", about: "We want to move our existing merchant network onto our own licence. A clean shell with an approved application is ideal.", budgetMax: 4_000_000, countries: ["PL", "CZ", "EE", "LT"], licenseTypes: ["PI", "SPI"], categories: ["PAYMENT"], assetTypes: ["LICENSE_ONLY", "SHELF_COMPANY"] },
   },
   {
-    email: "helen.park@demo.io", name: "Helen Park", companyName: "Park Wealth", country: "CA",
+    email: "helen.park@example.com", name: "Helen Park", companyName: "Park Wealth", country: "CA",
     profile: { buyerType: "INDIVIDUAL", headline: "Individual buyer interested in small licensed shells", budgetMin: 40_000, budgetMax: 500_000, countries: ["MT", "LT", "PL"], licenseTypes: [], categories: ["PAYMENT", "CRYPTO"], assetTypes: ["SHELF_COMPANY"] },
   },
   {
-    email: "viktor.horak@demo.io", name: "Viktor Horak", companyName: "Horak & Partners", country: "CZ",
+    email: "viktor.horak@example.com", name: "Viktor Horak", companyName: "Horak & Partners", country: "CZ",
     profile: { buyerType: "FAMILY_OFFICE", headline: "Long-term holder of regulated financial infrastructure", about: "Looking for a small credit institution with a stable deposit base. We do not plan to change management.", budgetMin: 8_000_000, countries: [], licenseTypes: ["BANKING"], categories: ["BANK"], assetTypes: ["ACTIVE_BUSINESS"] },
   },
   {
-    email: "rachel.green@demo.io", name: "Rachel Green", companyName: "Northgate Fintech", country: "GB",
+    email: "rachel.green@example.com", name: "Rachel Green", companyName: "Northgate Fintech", country: "GB",
     profile: { buyerType: "STRATEGIC", headline: "Fintech operator adding EU payment licences", about: "Northgate needs EU passporting after Brexit and is open to both operating businesses and dormant entities.", budgetMin: 1_000_000, budgetMax: 6_000_000, countries: ["IE", "CY", "MT"], licenseTypes: ["EMI", "PSP"], categories: ["FINTECH", "EMI"], assetTypes: [] },
   },
   {
-    email: "mark.silva@demo.io", name: "Mark Silva", companyName: "Silva Trading", country: "CY",
+    email: "mark.silva@example.com", name: "Mark Silva", companyName: "Silva Trading", country: "CY",
     status: "SUSPENDED", statusReason: SUSPENDED_BUYER_REASON, statusChangedAt: daysAgo(5),
     profile: { buyerType: "INDIVIDUAL", headline: "Private buyer looking for a Maltese VASP", budgetMin: 500_000, budgetMax: 1_500_000, countries: ["MT"], licenseTypes: ["VASP"], categories: ["CRYPTO"], assetTypes: [] },
   },
   {
     // empty profile: hidden from the buyers catalog, sees the "add your interests" hint
-    email: "irina.kowal@demo.io", name: "Irina Kowal", companyName: "Kowal Advisory", country: "EE",
+    email: "irina.kowal@example.com", name: "Irina Kowal", companyName: "Kowal Advisory", country: "EE",
     profile: {},
   },
 ];
@@ -283,7 +284,7 @@ async function main() {
   await db.$executeRawUnsafe(`ALTER SEQUENCE "Asset_id_seq" RESTART WITH 700`);
 
   const manager = await db.user.create({
-    data: { email: "anna@n5deal.demo", name: "Anna Kovalenko", companyName: "N5Deal", country: "MT", role: "MANAGER", passwordHash },
+    data: { email: "anna@example.com", name: "Anna Kovalenko", companyName: "FintechDeeals", country: "MT", role: "MANAGER", passwordHash },
   });
 
   const sellerRows: User[] = [];
@@ -386,6 +387,13 @@ async function main() {
     }
   });
   for (const entry of log) await db.moderationLog.create({ data: entry });
+
+  // the login page lists accounts from DEMO_ACCOUNT_EMAILS: fail loudly if the two drift apart
+  const seeded = (await db.user.findMany({ select: { email: true } })).map((u) => u.email).sort();
+  const listed = [...DEMO_ACCOUNT_EMAILS].sort();
+  if (seeded.join() !== listed.join()) {
+    throw new Error("Seeded emails differ from DEMO_ACCOUNT_EMAILS in src/features/auth/demo.ts");
+  }
 
   const counts = {
     users: await db.user.count(),

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { APP_NAME } from "@/lib/brand";
 import "./globals.css";
 
 const inter = Inter({
@@ -11,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "N5Deal",
-  description: "N5Deal marketplace prototype",
+  title: APP_NAME,
+  description: `${APP_NAME} marketplace prototype`,
 };
 
 export default function RootLayout({
