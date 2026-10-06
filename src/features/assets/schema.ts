@@ -71,7 +71,7 @@ export const DESCRIPTION_MAX = 2000;
 export const PRICE_MAX = 1_000_000_000;
 const COUNTRY_CODES = new Set(COUNTRIES.map((c) => c.code));
 
-function intField(min: number, max: number, message: string) {
+export function intField(min: number, max: number, message: string) {
   return z
     .string()
     .trim()
