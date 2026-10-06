@@ -176,7 +176,7 @@ function StatusBlock({ asset }: { asset: AssetDetail }) {
         <StatusBadge status={asset.status} />
       </div>
       {asset.status === "REMOVED" && (
-        <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm break-words text-danger-text">
+        <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm break-words text-danger-text">
           Removed from listings{asset.removedReason ? `: ${asset.removedReason}` : "."}
         </p>
       )}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChipGroup, CountryChecklist, FilterFooter, FilterGroup, FilterPanel } from "@/components/shared/filter-panel";
 import { FilterBar } from "@/components/shared/filter-bar";
@@ -63,7 +64,10 @@ export function BuyerFilters({
               items={matchItems}
               onValueChange={(v) => update({ asset: v === NONE ? null : String(v) })}
             >
-              <SelectTrigger aria-label="Match against one of your assets" className="min-w-0 flex-1 sm:w-64 sm:flex-none">
+              <SelectTrigger
+                aria-label="Match against one of your assets"
+                className="min-w-0 flex-1 sm:w-64 sm:flex-none"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent alignItemWithTrigger={false} align="end" className="min-w-72">
@@ -82,7 +86,15 @@ export function BuyerFilters({
 }
 
 /** Draft state lives here; the URL changes only on Apply / Reset. Mounted only while the panel is open. */
-function FiltersForm({ params, onDone, className }: { params: BuyerListParams; onDone: () => void; className?: string }) {
+function FiltersForm({
+  params,
+  onDone,
+  className,
+}: {
+  params: BuyerListParams;
+  onDone: () => void;
+  className?: string;
+}) {
   const { update } = useListState();
   const [type, setType] = useState(params.type);
   const [country, setCountry] = useState(params.country);
@@ -125,20 +137,30 @@ function FiltersForm({ params, onDone, className }: { params: BuyerListParams; o
         <ChipGroup title="Type of business" labels={ASSET_CATEGORY_LABELS} value={category} onChange={setCategory} />
         <FilterGroup title="Budget overlaps (EUR)">
           <div className="grid grid-cols-2 gap-2">
-            <Input
-              inputMode="numeric"
-              placeholder="From"
-              aria-label="Budget from"
-              value={budgetMin}
-              onChange={(e) => setBudgetMin(e.target.value.replace(/\D/g, "").slice(0, 9))}
-            />
-            <Input
-              inputMode="numeric"
-              placeholder="To"
-              aria-label="Budget to"
-              value={budgetMax}
-              onChange={(e) => setBudgetMax(e.target.value.replace(/\D/g, "").slice(0, 9))}
-            />
+            <div>
+              <Label htmlFor="budget-from" className="sr-only">
+                Budget from
+              </Label>
+              <Input
+                inputMode="numeric"
+                placeholder="From"
+                id="budget-from"
+                value={budgetMin}
+                onChange={(e) => setBudgetMin(e.target.value.replace(/\D/g, "").slice(0, 9))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="budget-to" className="sr-only">
+                Budget to
+              </Label>
+              <Input
+                inputMode="numeric"
+                placeholder="To"
+                id="budget-to"
+                value={budgetMax}
+                onChange={(e) => setBudgetMax(e.target.value.replace(/\D/g, "").slice(0, 9))}
+              />
+            </div>
           </div>
         </FilterGroup>
       </div>
