@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { AssetCategory, AssetStatus } from "@prisma/client";
+import { COUNTRIES } from "@/lib/reference";
 import { assetIdSchema } from "@/features/assets/schema";
 
 export const REASON_MAX = 500;
@@ -27,3 +29,20 @@ export const adminUsersParams = z.object({
   page: z.coerce.number().int().min(1).max(100_000).catch(1),
 });
 export type AdminUsersParams = z.infer<typeof adminUsersParams>;
+
+// ---------- assets list (`/admin/assets`) ----------
+
+/** URL state of `/admin/assets`: status, category, country, validated, search and page. */
+export const adminAssetsParams = z.object({
+  q: z.string().trim().max(100).catch(""),
+  status: z.enum(AssetStatus).optional().catch(undefined),
+  category: z.enum(AssetCategory).optional().catch(undefined),
+  country: z
+    .string()
+    .refine((c) => COUNTRIES.some((x) => x.code === c))
+    .optional()
+    .catch(undefined),
+  validated: z.enum(["yes", "no"]).optional().catch(undefined),
+  page: z.coerce.number().int().min(1).max(100_000).catch(1),
+});
+export type AdminAssetsParams = z.infer<typeof adminAssetsParams>;
