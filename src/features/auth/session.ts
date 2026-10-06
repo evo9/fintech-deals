@@ -22,6 +22,7 @@ export type SessionUser = {
 function secretKey() {
   const secret = process.env.SESSION_SECRET;
   if (!secret) throw new Error("SESSION_SECRET is not set");
+  if (secret.length < 32) throw new Error("SESSION_SECRET must be at least 32 characters");
   return new TextEncoder().encode(secret);
 }
 
@@ -36,8 +37,10 @@ export async function signSessionToken(userId: string): Promise<string> {
 /** Returns the user id, or null for a missing, tampered or expired token. */
 export async function verifySessionToken(token: string | undefined): Promise<string | null> {
   if (!token) return null;
+  // Outside the try: a missing or short secret is a deploy error and must not look like "logged out".
+  const key = secretKey();
   try {
-    const { payload } = await jwtVerify(token, secretKey(), { algorithms: ["HS256"] });
+    const { payload } = await jwtVerify(token, key, { algorithms: ["HS256"] });
     return typeof payload.userId === "string" ? payload.userId : null;
   } catch {
     return null;
