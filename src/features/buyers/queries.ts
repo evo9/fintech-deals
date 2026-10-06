@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { PAGE_SIZE, toSkipTake } from "@/lib/pagination";
 import { notFound } from "next/navigation";
-import { catalogBuyersWhere, ownAssetsWhere, withVisibility } from "@/features/access/visibility";
+import { canViewBuyerProfile, catalogBuyersWhere, ownAssetsWhere, withVisibility } from "@/features/access/visibility";
 import type { SessionUser } from "@/features/auth/session";
 import type { BuyerListParams } from "./schema";
 import { compareByMatch, scoreMatch, type AssetForMatch, type BuyerInterests, type MatchResult } from "@/features/matching/score";
@@ -163,4 +163,43 @@ export async function listCatalogBuyers(viewer: SessionUser, p: BuyerListParams)
     db.user.count({ where }),
   ]);
   return { items: rows.map(score), total, myAssets, matchAsset: undefined };
+}
+
+const buyerProfileSelect = {
+  id: true,
+  name: true,
+  companyName: true,
+  country: true,
+  role: true,
+  status: true,
+  buyerProfile: {
+    select: {
+      buyerType: true,
+      headline: true,
+      about: true,
+      countries: true,
+      licenseTypes: true,
+      categories: true,
+      assetTypes: true,
+      budgetMin: true,
+      budgetMax: true,
+      updatedAt: true,
+    },
+  },
+} satisfies Prisma.UserSelect;
+
+export type BuyerProfileView = Prisma.UserGetPayload<{ select: typeof buyerProfileSelect }>;
+
+/**
+ * Buyer page for a seller: only buyers who are in the catalog (active, profile filled).
+ * A missing, hidden, suspended or non-buyer id is a 404, indistinguishable from each other.
+ */
+export async function getBuyerForSeller(viewer: SessionUser, rawId: string): Promise<BuyerProfileView> {
+  if (viewer.role !== "SELLER" || !/^[A-Za-z0-9]{10,40}$/.test(rawId)) notFound();
+  const buyer = await db.user.findFirst({
+    where: withVisibility(catalogBuyersWhere, { id: rawId }),
+    select: buyerProfileSelect,
+  });
+  if (!buyer || !canViewBuyerProfile(viewer, buyer)) notFound();
+  return buyer;
 }
