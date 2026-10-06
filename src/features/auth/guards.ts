@@ -27,6 +27,10 @@ type RequireUserOptions = {
 };
 
 /**
+ * In a Server Action call it INSIDE `runAction(async () => { const user = await requireUser(...) ... })`:
+ * the "Your account is suspended" ActionError is turned into a result only there; outside it the
+ * user would get a generic Next error instead of the message.
+ *
  * No session -> /login?next=. REMOVED -> /account-removed (a route handler: cookies cannot be
  * deleted while rendering). Wrong role -> 404. SUSPENDED without allowSuspended -> ActionError.
  */

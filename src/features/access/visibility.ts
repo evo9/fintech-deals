@@ -4,6 +4,18 @@ import type { AssetStatus, ModerationAction, Prisma, Role, UserStatus } from "@p
 
 type Viewer = { id: string; role: Role; status: UserStatus };
 
+/**
+ * Visibility must never be combined with search or filters by spreading: `{ ...visibility, OR: [...] }`
+ * silently replaces the visibility `OR` (a seller would see other sellers' drafts), and a `buyerProfile`
+ * or `seller` filter replaces the "filled profile" / "active seller" rule. Always compose with this.
+ */
+export function withVisibility<W extends Prisma.AssetWhereInput | Prisma.UserWhereInput>(
+  visibility: W,
+  filters?: W,
+): W {
+  return { AND: filters ? [visibility, filters] : [visibility] } as W;
+}
+
 // ---------- assets ----------
 
 /** Published asset of an active seller: visible to every role. */
@@ -184,6 +196,8 @@ export function canSendMessage(
   counterpart: { id: string; role: Role; status: UserStatus },
 ): ContactCheck {
   if (!canViewConversation(sender, conversation)) return NOT_FOUND;
+  const otherId = sender.id === conversation.buyerId ? conversation.sellerId : conversation.buyerId;
+  if (counterpart.id !== otherId) return NOT_FOUND; // never trust a counterpart picked by the caller
   return fromReason(contactBlockReason(sender, counterpart));
 }
 

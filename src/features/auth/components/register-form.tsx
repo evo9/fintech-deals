@@ -69,7 +69,7 @@ export function RegisterForm() {
               <label
                 key={option.value}
                 className={cn(
-                  "relative inline-flex h-9 min-w-24 cursor-pointer items-center justify-center rounded-full border border-transparent px-4 text-sm font-medium text-foreground/75 transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
+                  "relative inline-flex h-9 min-w-24 cursor-pointer items-center justify-center rounded-full border border-transparent px-4 text-sm font-medium text-foreground/75 transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring",
                   role === option.value && "border-border bg-surface text-foreground",
                 )}
               >

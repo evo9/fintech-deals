@@ -16,27 +16,27 @@ export function SearchInput({
   placeholder: string;
   label?: string;
 }) {
-  const { update } = useListState();
+  const { update, pending } = useListState();
   const [q, setQ] = useState(initialQ);
-  // last value pushed to the URL: lets us tell "the server caught up" from "the URL was cleared elsewhere"
-  const sent = useRef(initialQ);
+  // true between a keystroke and the moment the debounced value is pushed to the URL
+  const dirty = useRef(false);
+
+  // The URL changed from outside (Clear filters, back button): follow it, but never while the
+  // user is typing or a request is in flight, otherwise a late answer would undo keystrokes.
+  useEffect(() => {
+    if (pending || dirty.current) return;
+    setQ((current) => (current.trim() === initialQ ? current : initialQ));
+  }, [initialQ, pending]);
 
   useEffect(() => {
-    if (initialQ !== sent.current) {
-      sent.current = initialQ;
-      setQ(initialQ);
-    }
-  }, [initialQ]);
-
-  useEffect(() => {
+    if (!dirty.current) return;
     const value = q.trim();
-    if (value === sent.current) return;
     const t = setTimeout(() => {
-      sent.current = value;
-      update({ q: value || null });
+      dirty.current = false;
+      if (value !== initialQ) update({ q: value || null });
     }, 300);
     return () => clearTimeout(t);
-  }, [q, update]);
+  }, [q, initialQ, update]);
 
   return (
     <div className="relative w-full sm:max-w-sm">
@@ -44,7 +44,10 @@ export function SearchInput({
       <Input
         type="search"
         value={q}
-        onChange={(e) => setQ(e.target.value)}
+        onChange={(e) => {
+          dirty.current = true;
+          setQ(e.target.value);
+        }}
         placeholder={placeholder}
         aria-label={label}
         className="pl-10"

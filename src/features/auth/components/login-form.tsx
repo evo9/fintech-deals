@@ -87,7 +87,7 @@ export function LoginForm({
             </p>
           </div>
 
-          <p role="alert" className="min-h-5 text-sm text-danger-text">
+          <p role="alert" className="min-h-10 text-sm text-danger-text sm:min-h-5">
             {notice}
           </p>
 

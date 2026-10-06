@@ -35,11 +35,11 @@ export function AppHeader({
   const [pending, startTransition] = useTransition();
 
   return (
-    <header className="sticky top-3 z-40 mx-auto w-full max-w-[1280px] px-4 pt-3">
-      <div className="flex h-14 items-center gap-2 rounded-full border bg-surface/85 pr-2 pl-5 shadow-md backdrop-blur">
+    <header className="pointer-events-none sticky top-3 z-40 mx-auto mt-3 w-full max-w-[1280px] px-4">
+      <div className="pointer-events-auto flex h-14 items-center gap-2 rounded-full border bg-surface/85 pr-2 pl-5 shadow-md backdrop-blur">
         <Link
           href={homeHref}
-          className="mr-2 rounded-full text-lg font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="mr-2 rounded-full text-lg font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring"
         >
           {APP_NAME}
         </Link>
@@ -53,7 +53,7 @@ export function AppHeader({
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring",
                   active
                     ? "bg-ink text-white hover:text-white"
                     : "text-foreground/75 hover:bg-primary-soft hover:text-foreground",
@@ -71,7 +71,7 @@ export function AppHeader({
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <Button variant="ghost" aria-label="Account menu" className="max-w-48 px-3">
+                <Button variant="ghost" aria-label={`Account menu, ${user.name}`} className="max-w-48 px-3">
                   <UserIcon aria-hidden />
                   <span className="hidden truncate sm:inline">{user.name}</span>
                   <ChevronDownIcon aria-hidden className="size-4 shrink-0 text-text-muted" />

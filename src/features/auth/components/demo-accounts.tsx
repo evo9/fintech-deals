@@ -44,7 +44,7 @@ export function DemoAccounts({
                       type="button"
                       onClick={() => onPick(account)}
                       aria-pressed={selectedEmail === account.email}
-                      className="flex w-full items-center justify-between gap-3 rounded-lg border bg-surface px-4 py-2.5 text-left transition-colors outline-none hover:border-primary hover:bg-primary-soft focus-visible:ring-3 focus-visible:ring-ring/50 aria-pressed:border-primary aria-pressed:bg-primary-soft"
+                      className="flex w-full items-center justify-between gap-3 rounded-lg border bg-surface px-4 py-2.5 text-left transition-colors outline-none hover:border-primary hover:bg-primary-soft focus-visible:ring-3 focus-visible:ring-ring aria-pressed:border-primary aria-pressed:bg-primary-soft"
                     >
                       <span className="min-w-0">
                         <span className="block truncate text-base font-semibold">{account.name}</span>

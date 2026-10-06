@@ -51,7 +51,7 @@ export function ListBody({ children, className }: { children: ReactNode; classNa
       className={cn("relative transition-opacity motion-reduce:transition-none", pending && "opacity-60", className)}
     >
       <div className={cn("absolute inset-x-0 -top-2 h-0.5 overflow-hidden", !pending && "invisible")}>
-        <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-primary motion-reduce:animate-none" />
+        <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-primary motion-reduce:w-full motion-reduce:animate-none motion-reduce:opacity-60" />
       </div>
       {children}
     </div>
