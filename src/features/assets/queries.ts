@@ -1,9 +1,15 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { Prisma, type AssetCategory } from "@prisma/client";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, toSkipTake } from "@/lib/pagination";
 import { COUNTRIES } from "@/lib/reference";
-import { catalogAssetsWhere, withVisibility } from "@/features/access/visibility";
+import {
+  assetVisibilityWhere,
+  canViewAsset,
+  catalogAssetsWhere,
+  withVisibility,
+} from "@/features/access/visibility";
 import type { SessionUser } from "@/features/auth/session";
 import type { AssetListParams } from "./schema";
 
@@ -106,21 +112,67 @@ export async function listCatalogAssets(viewer: SessionUser, p: AssetListParams)
     AND: p.category ? [...filters, { category: p.category }] : filters,
   });
 
-  // Interactive transaction: list and counters see one snapshot (groupBy loses its typing in an array transaction)
-  const [items, grouped] = await db.$transaction(async (tx) => [
-    await tx.asset.findMany({
+  // Array transaction (one round trip): an interactive one needs its own connection and times out on the pooler
+  const [items, grouped] = await db.$transaction([
+    db.asset.findMany({
       where: listWhere,
       orderBy: assetOrderBy(p.sort),
       ...toSkipTake(p.page, PAGE_SIZE.cards),
       select: assetCardSelect,
     }),
-    await tx.asset.groupBy({ by: ["category"], where: tabsWhere, _count: { _all: true }, orderBy: { category: "asc" } }),
-  ] as const);
+    db.asset.groupBy({
+      by: ["category"],
+      where: tabsWhere,
+      _count: { _all: true },
+      orderBy: { category: "asc" },
+    }),
+  ]);
 
   const counts: CategoryCounts = { ALL: 0, BANK: 0, FINTECH: 0, PAYMENT: 0, EMI: 0, CRYPTO: 0 };
   for (const row of grouped) {
-    counts[row.category] = row._count._all;
-    counts.ALL += row._count._all;
+    // Inside an array transaction Prisma types `_count` as `true | {...}`; with `_all` it is always the object
+    const n = typeof row._count === "object" ? (row._count._all ?? 0) : 0;
+    counts[row.category] = n;
+    counts.ALL += n;
   }
   return { items, total: p.category ? counts[p.category] : counts.ALL, counts };
 }
+
+const assetDetailSelect = {
+  id: true,
+  sellerId: true,
+  headline: true,
+  category: true,
+  licenseType: true,
+  assetType: true,
+  businessStatus: true,
+  country: true,
+  regulator: true,
+  yearOfIssue: true,
+  employees: true,
+  askingPrice: true,
+  included: true,
+  description: true,
+  status: true,
+  publishedAt: true,
+  validatedAt: true,
+  removedReason: true,
+  seller: { select: { name: true, companyName: true, country: true, status: true } },
+} satisfies Prisma.AssetSelect;
+
+export type AssetDetail = Prisma.AssetGetPayload<{ select: typeof assetDetailSelect }>;
+
+/**
+ * Asset page: buyer - published assets of active sellers, seller - own in any status plus published,
+ * manager - all. Anything else is a 404 (also for a malformed id), never a "forbidden".
+ * `cache` lets generateMetadata and the page share one query.
+ */
+export const getAssetForViewer = cache(async (viewer: SessionUser, rawId: string): Promise<AssetDetail> => {
+  if (!/^\d{1,9}$/.test(rawId)) notFound();
+  const asset = await db.asset.findFirst({
+    where: withVisibility(assetVisibilityWhere(viewer), { id: Number(rawId) }),
+    select: assetDetailSelect,
+  });
+  if (!asset || !canViewAsset(viewer, asset)) notFound();
+  return asset;
+});
