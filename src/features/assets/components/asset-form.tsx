@@ -126,7 +126,7 @@ function Field({
         {hint && <span className="text-xs text-text-muted tabular-nums">{hint}</span>}
       </div>
       {children}
-      <p id={`${id}-error`} className="min-h-5 text-sm text-danger-text">
+      <p id={`${id}-error`} aria-live="polite" className="min-h-5 text-sm text-danger-text">
         {error}
       </p>
     </div>
@@ -196,10 +196,21 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
   }
 
   const errors = clientErrors ?? (state && !state.ok ? state.fieldErrors : undefined);
+  // fields the user has touched since the last failed submit: their old message goes away
+  const [cleared, setCleared] = useState<string[]>([]);
+  const [seenErrors, setSeenErrors] = useState(errors);
+  if (errors !== seenErrors) {
+    setSeenErrors(errors);
+    setCleared([]);
+  }
+  const clear = (...keys: string[]) => setCleared((c) => [...new Set([...c, ...keys])]);
   const dirty = JSON.stringify(values) !== baseline;
 
-  const set = <K extends keyof Values>(key: K, value: Values[K]) => setValues((v) => ({ ...v, [key]: value }));
-  const err = (key: string) => errors?.[key]?.[0];
+  const set = <K extends keyof Values>(key: K, value: Values[K]) => {
+    setValues((v) => ({ ...v, [key]: value }));
+    clear(key, ...(key === "priceOnRequest" ? ["askingPrice"] : []));
+  };
+  const err = (key: string) => (cleared.includes(key) ? undefined : errors?.[key]?.[0]);
 
   useFocusFirstError(errors);
 
@@ -234,6 +245,7 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
   }, [state]);
 
   function changeCountry(code: string) {
+    clear("country", "regulator");
     setValues((v) => {
       // the regulator follows the country until the seller types their own
       const followsCountry = v.regulator === "" || v.regulator === defaultRegulator(v.country);
@@ -300,7 +312,7 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
 
       <fieldset disabled={readOnly} className="flex min-w-0 flex-col gap-6">
         {readOnly && (
-          <p className="rounded-lg bg-destructive/10 px-4 py-3 text-sm break-words text-danger-text">
+          <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm break-words text-danger-text">
             This asset was removed from listings{asset.removedReason ? `: ${asset.removedReason}` : "."} It can no longer be
             edited or published.
           </p>
@@ -565,6 +577,7 @@ function DeleteDraft({ id, disabled }: { id: number; disabled: boolean }) {
           <DialogClose render={<Button type="button" variant="outline" disabled={pending} />}>Cancel</DialogClose>
           <Button
             type="button"
+            variant="destructive"
             disabled={pending}
             onClick={() =>
               startTransition(async () => {

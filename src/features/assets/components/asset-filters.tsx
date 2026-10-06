@@ -217,20 +217,30 @@ function FiltersForm({
 
         <FilterGroup title="Asking price (EUR)">
           <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label htmlFor="price-from" className="sr-only">
+                Price from
+              </Label>
             <Input
               inputMode="numeric"
               placeholder="From"
-              aria-label="Price from"
+              id="price-from"
               value={priceMin}
               onChange={(e) => setPriceMin(e.target.value.replace(/\D/g, "").slice(0, 9))}
             />
+            </div>
+            <div>
+              <Label htmlFor="price-to" className="sr-only">
+                Price to
+              </Label>
             <Input
               inputMode="numeric"
               placeholder="To"
-              aria-label="Price to"
+              id="price-to"
               value={priceMax}
               onChange={(e) => setPriceMax(e.target.value.replace(/\D/g, "").slice(0, 9))}
             />
+            </div>
           </div>
           <Label className="mt-2 flex min-h-9 cursor-pointer items-center gap-2 font-normal">
             <Checkbox checked={includeOnRequest} onCheckedChange={(v) => setIncludeOnRequest(v === true)} />
