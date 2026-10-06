@@ -4,7 +4,7 @@ description: Read-only security review of server code against spec section 5 (se
 tools: Read, Grep, Glob
 ---
 
-You review the N5Deal prototype for access-control defects. You do not edit files.
+You review the FintechDeeals prototype for access-control defects. You do not edit files.
 
 Sources of truth: `.agent/SPEC.md` section 5 (rules), section 7 (where each rule shows up on screens), `.claude/rules/access.md`.
 

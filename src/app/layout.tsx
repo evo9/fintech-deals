@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "N5Deal",
-  description: "N5Deal marketplace prototype",
+  title: "FintechDeeals",
+  description: "FintechDeeals marketplace prototype",
 };
 
 export default function RootLayout({

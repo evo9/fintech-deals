@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Prototype of the N5Deal marketplace (take-home assignment). Time-boxed: the whole project must be delivered within 24 hours of the start.
+Prototype of the FintechDeeals marketplace (take-home assignment). Time-boxed: the whole project must be delivered within 24 hours of the start.
 
 ## Sources of truth
 

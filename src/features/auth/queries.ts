@@ -1,10 +1,9 @@
 import type { Role, UserStatus } from "@prisma/client";
 import { db } from "@/lib/db";
+import { DEMO_ACCOUNT_EMAILS } from "./demo";
 
-// Only seeded demo accounts are listed on the login page. Real registrations must not
+// Only the seeded demo accounts are listed on the login page. Real registrations must not
 // appear there: that would publish their emails.
-const DEMO_EMAIL_SUFFIXES = ["@demo.io", "@n5deal.demo"];
-
 export type DemoAccount = {
   email: string;
   name: string;
@@ -18,7 +17,7 @@ export async function listDemoAccounts(): Promise<DemoAccount[]> {
   return db.user.findMany({
     where: {
       status: { not: "REMOVED" },
-      OR: DEMO_EMAIL_SUFFIXES.map((suffix) => ({ email: { endsWith: suffix } })),
+      email: { in: [...DEMO_ACCOUNT_EMAILS] },
     },
     orderBy: [{ role: "asc" }, { name: "asc" }],
     select: { email: true, name: true, companyName: true, role: true, status: true },

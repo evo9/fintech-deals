@@ -96,7 +96,7 @@ export function LoginForm({
         </form>
 
         <p className="mt-6 text-sm text-text-muted">
-          New to N5Deal?{" "}
+          New to FintechDeeals?{" "}
           <Link href="/register" className="font-semibold text-primary hover:underline">
             Create an account
           </Link>
