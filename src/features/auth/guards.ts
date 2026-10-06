@@ -12,7 +12,9 @@ export function safeNextPath(next: string | null | undefined): string | null {
   try {
     const url = new URL(next, "https://internal.invalid");
     if (url.origin !== "https://internal.invalid") return null;
-    return url.pathname + url.search + url.hash;
+    // dot segments normalize "/..//evil.com" to "//evil.com", which is protocol-relative: check the result too
+    const path = url.pathname + url.search + url.hash;
+    return path.startsWith("//") ? null : path;
   } catch {
     return null;
   }

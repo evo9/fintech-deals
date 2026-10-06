@@ -52,7 +52,7 @@ export function AssetsTable({ items }: { items: AdminAssetRow[] }) {
               </TableCell>
               <TableCell>
                 {a.validatedAt ? (
-                  <span className="inline-flex items-center gap-1 text-success">
+                  <span className="inline-flex items-center gap-1 text-success-text">
                     <BadgeCheckIcon aria-hidden className="size-4" />
                     Validated
                   </span>

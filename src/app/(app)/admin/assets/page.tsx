@@ -47,11 +47,9 @@ export default async function AdminAssetsPage({ searchParams }: Props) {
               title={filtered ? "No assets match these filters." : "No assets yet."}
               description={filtered ? "Try a wider search or remove some filters." : "Assets appear here once sellers create them."}
             >
-              {filtered && (
-                <Link href="/admin/assets" className={buttonVariants({ variant: "secondary" })}>
-                  Clear filters
-                </Link>
-              )}
+              <Link href={filtered ? "/admin/assets" : "/admin/users"} className={buttonVariants({ variant: "secondary" })}>
+                {filtered ? "Clear filters" : "Go to participants"}
+              </Link>
             </EmptyState>
           )}
         </ListBody>

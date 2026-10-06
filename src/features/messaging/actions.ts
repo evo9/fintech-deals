@@ -94,12 +94,22 @@ export async function startConversation(
 
         // The checks above ran a moment ago: a manager may have suspended the other side or the seller
         // may have withdrawn the asset since. Re-check inside the transaction, before anything is written.
+        const me = await tx.user.findUnique({ where: { id: user.id }, select: { status: true } });
+        if (me?.status !== "ACTIVE") throw new ActionError("Your account is suspended");
         const other = await tx.user.findUnique({
           where: { id: user.id === buyerId ? sellerId : buyerId },
           select: { status: true },
         });
         const paused = other ? participantPausedReason(other.status) : "Not found";
         if (paused) throw new ActionError(paused);
+        if (input.kind === "buyer") {
+          // the buyer may have emptied the profile since the catalog check: then they are hidden from sellers
+          const stillInCatalog = await tx.user.findFirst({
+            where: withVisibility(catalogBuyersWhere, { id: buyerId }),
+            select: { id: true },
+          });
+          if (!stillInCatalog) throw new ActionError(NOT_FOUND_BUYER);
+        }
         if (assetId !== null) {
           const stillListed = await tx.asset.findFirst({
             where: { id: assetId, sellerId, status: "PUBLISHED" },
@@ -151,6 +161,8 @@ export async function sendMessage(rawConversationId: unknown, rawBody: unknown):
     const message = await db.$transaction(
       async (tx) => {
         // the check above ran a moment ago: re-read the other side before writing
+        const me = await tx.user.findUnique({ where: { id: user.id }, select: { status: true } });
+        if (me?.status !== "ACTIVE") throw new ActionError("Your account is suspended");
         const other = await tx.user.findUnique({ where: { id: counterpart.id }, select: { status: true } });
         const paused = other ? participantPausedReason(other.status) : NOT_FOUND_CONVERSATION;
         if (paused) throw new ActionError(paused);

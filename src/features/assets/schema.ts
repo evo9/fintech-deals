@@ -23,6 +23,15 @@ export const euros = z
   .optional()
   .catch(undefined);
 
+/** A range typed backwards ("from" above "to") is swapped instead of silently giving an empty list. */
+export function swapRange<K1 extends string, K2 extends string>(from: K1, to: K2) {
+  return <T extends Partial<Record<K1 | K2, number | undefined>>>(p: T): T => {
+    const lo = p[from];
+    const hi = p[to];
+    return lo !== undefined && hi !== undefined && lo > hi ? { ...p, [from]: hi, [to]: lo } : p;
+  };
+}
+
 export const ASSET_SORTS = ["newest", "price_asc", "price_desc", "best_match"] as const;
 
 /** URL state of the buyer catalog. Invalid values fall back to defaults instead of throwing. */
@@ -40,7 +49,7 @@ export const assetListParams = z.object({
   mine: flag,
   sort: z.enum(ASSET_SORTS).catch("newest"),
   page: z.coerce.number().int().min(1).max(100_000).catch(1),
-});
+}).transform(swapRange("priceMin", "priceMax"));
 export type AssetListParams = z.infer<typeof assetListParams>;
 
 export const DEFAULT_ASSET_SORT = "newest" satisfies AssetListParams["sort"];
