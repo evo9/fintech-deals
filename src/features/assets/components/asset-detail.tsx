@@ -15,6 +15,8 @@ import {
   LICENSE_TYPE_LABELS,
   countryName,
 } from "@/lib/reference";
+import { MatchCriteria } from "@/features/matching/components/match-criteria";
+import { isShown, isStrongMatch, type MatchResult } from "@/features/matching/score";
 import type { AssetDetail } from "../queries";
 
 const NOT_SPECIFIED = "Not specified";
@@ -104,7 +106,15 @@ export function AssetMain({ asset, showStatus }: { asset: AssetDetail; showStatu
 }
 
 /** Right column (sticky on desktop): price, seller and the actions of the viewer's role. */
-export function AssetSidebar({ asset, viewer }: { asset: AssetDetail; viewer: SessionUser }) {
+export function AssetSidebar({
+  asset,
+  viewer,
+  match,
+}: {
+  asset: AssetDetail;
+  viewer: SessionUser;
+  match: MatchResult | null;
+}) {
   const isOwner = canManageOwnAsset(viewer, asset);
   const sellerName = asset.seller.companyName?.trim() || asset.seller.name;
 
@@ -126,10 +136,23 @@ export function AssetSidebar({ asset, viewer }: { asset: AssetDetail; viewer: Se
         )}
       </div>
 
+      {viewer.role === "BUYER" && isShown(match) && <MatchBlock match={match} />}
       {viewer.role === "BUYER" && <BuyerActions suspended={viewer.status === "SUSPENDED"} />}
       {viewer.role === "SELLER" && asset.sellerId === viewer.id && <OwnerActions asset={asset} canManage={isOwner} />}
       {viewer.role === "MANAGER" && <ManagerActions asset={asset} />}
     </aside>
+  );
+}
+
+/** How the asset fits the buyer's interests; hidden when they have set none. */
+function MatchBlock({ match }: { match: MatchResult }) {
+  return (
+    <div className="flex flex-col gap-2 border-t pt-4 text-sm">
+      <p className="font-semibold">
+        {isStrongMatch(match) ? "Strong match" : `Matches ${match.matched} of ${match.considered} of your criteria`}
+      </p>
+      <MatchCriteria match={match} />
+    </div>
   );
 }
 

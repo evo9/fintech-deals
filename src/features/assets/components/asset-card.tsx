@@ -12,6 +12,7 @@ import {
   countryName,
 } from "@/lib/reference";
 import { cn } from "@/lib/utils";
+import { MatchBadge } from "@/features/matching/components/match-badge";
 import type { AssetCard as AssetCardData } from "../queries";
 import {
   CARD,
@@ -38,7 +39,7 @@ function Chip({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** Catalog card (spec 7.3). The matching badge ("Matches 4/5") comes with task 4.5. */
+/** Catalog card (spec 7.3). */
 export function AssetCard({ asset, viewerSuspended }: { asset: AssetCardData; viewerSuspended: boolean }) {
   const id = formatAssetId(asset.id);
 
@@ -54,12 +55,15 @@ export function AssetCard({ asset, viewerSuspended }: { asset: AssetCardData; vi
             <CountryFlag code={asset.country} className="w-9 sm:hidden" />
             <p className="truncate font-semibold tabular-nums">Asset ID {id}</p>
           </div>
-          {asset.validatedAt && (
-            <span className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-success-text">
-              <BadgeCheckIcon aria-hidden className="size-4" />
-              Validated
-            </span>
-          )}
+          <div className="flex shrink-0 items-center gap-3">
+            {asset.validatedAt && (
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-success-text">
+                <BadgeCheckIcon aria-hidden className="size-4" />
+                <span className="sr-only min-[480px]:not-sr-only">Validated</span>
+              </span>
+            )}
+            <MatchBadge match={asset.match} />
+          </div>
         </div>
 
         <h2 className={cn(CARD_HEADLINE, "truncate text-lg leading-7 font-semibold")} title={asset.headline}>

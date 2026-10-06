@@ -23,7 +23,7 @@ const euros = z
   .optional()
   .catch(undefined);
 
-export const ASSET_SORTS = ["newest", "price_asc", "price_desc"] as const;
+export const ASSET_SORTS = ["newest", "price_asc", "price_desc", "best_match"] as const;
 
 /** URL state of the buyer catalog. Invalid values fall back to defaults instead of throwing. */
 export const assetListParams = z.object({

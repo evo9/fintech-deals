@@ -11,6 +11,14 @@ import {
   withVisibility,
 } from "@/features/access/visibility";
 import type { SessionUser } from "@/features/auth/session";
+import { getBuyerInterests } from "@/features/buyers/queries";
+import {
+  compareByMatch,
+  hasInterests,
+  scoreMatch,
+  type BuyerInterests,
+  type MatchResult,
+} from "@/features/matching/score";
 import type { AssetListParams } from "./schema";
 
 const assetCardSelect = {
@@ -32,7 +40,10 @@ const assetCardSelect = {
   sellerId: true,
 } satisfies Prisma.AssetSelect;
 
-export type AssetCard = Prisma.AssetGetPayload<{ select: typeof assetCardSelect }>;
+type AssetCardRow = Prisma.AssetGetPayload<{ select: typeof assetCardSelect }>;
+
+/** Card data plus the match with the viewer's interests (null when they have none). */
+export type AssetCard = AssetCardRow & { match: MatchResult | null };
 
 /** Same shape as the tabs: every category plus the "All" total. */
 export type CategoryCounts = Record<AssetCategory | "ALL", number>;
@@ -76,8 +87,23 @@ function priceWhere(p: AssetListParams): Prisma.AssetWhereInput | null {
   return { OR: [{ askingPrice: range }, ...(p.includeOnRequest ? [{ askingPrice: null }] : [])] };
 }
 
+/** "Only my interests": every criterion the buyer set becomes a filter; a price on request passes the budget. */
+function interestsWhere(i: BuyerInterests): Prisma.AssetWhereInput {
+  const budget: Prisma.IntNullableFilter = {};
+  if (i.budgetMin != null) budget.gte = i.budgetMin;
+  if (i.budgetMax != null) budget.lte = i.budgetMax;
+  const clauses: Prisma.AssetWhereInput[] = [
+    ...(i.countries.length ? [{ country: { in: i.countries } }] : []),
+    ...(i.licenseTypes.length ? [{ licenseType: { in: i.licenseTypes } }] : []),
+    ...(i.categories.length ? [{ category: { in: i.categories } }] : []),
+    ...(i.assetTypes.length ? [{ assetType: { in: i.assetTypes } }] : []),
+    ...(i.budgetMin != null || i.budgetMax != null ? [{ OR: [{ askingPrice: null }, { askingPrice: budget }] }] : []),
+  ];
+  return { AND: clauses };
+}
+
 /** Everything except the category: the tab counters must not depend on the selected tab. */
-async function buildFilters(p: AssetListParams): Promise<Prisma.AssetWhereInput[]> {
+async function buildFilters(p: AssetListParams, interests: BuyerInterests | null): Promise<Prisma.AssetWhereInput[]> {
   const clauses: Array<Prisma.AssetWhereInput | null> = [
     await searchWhere(p.q),
     p.country.length ? { country: { in: p.country } } : null,
@@ -86,7 +112,7 @@ async function buildFilters(p: AssetListParams): Promise<Prisma.AssetWhereInput[
     p.businessStatus.length ? { businessStatus: { in: p.businessStatus } } : null,
     priceWhere(p),
     p.validated ? { validatedAt: { not: null } } : null,
-    // `mine` (only my interests) is wired in with matching, task 4.5
+    p.mine && hasInterests(interests) ? interestsWhere(interests) : null,
   ];
   return clauses.filter((c): c is Prisma.AssetWhereInput => c !== null);
 }
@@ -106,18 +132,22 @@ function assetOrderBy(sort: AssetListParams["sort"]): Prisma.AssetOrderByWithRel
 export async function listCatalogAssets(viewer: SessionUser, p: AssetListParams) {
   if (viewer.role !== "BUYER") notFound();
 
-  const filters = await buildFilters(p);
+  const interests = await getBuyerInterests(viewer.id);
+  const interestsSet = hasInterests(interests);
+  const filters = await buildFilters(p, interests);
   const tabsWhere = withVisibility(catalogAssetsWhere, { AND: filters });
   const listWhere = withVisibility(catalogAssetsWhere, {
     AND: p.category ? [...filters, { category: p.category }] : filters,
   });
+  // "Best match" sorts in memory over the whole filtered set (a prototype shortcut, see README)
+  const bestMatch = p.sort === "best_match" && interestsSet;
 
   // Array transaction (one round trip): an interactive one needs its own connection and times out on the pooler
-  const [items, grouped] = await db.$transaction([
+  const [rows, grouped] = await db.$transaction([
     db.asset.findMany({
       where: listWhere,
-      orderBy: assetOrderBy(p.sort),
-      ...toSkipTake(p.page, PAGE_SIZE.cards),
+      orderBy: assetOrderBy(bestMatch ? "newest" : p.sort),
+      ...(bestMatch ? {} : toSkipTake(p.page, PAGE_SIZE.cards)),
       select: assetCardSelect,
     }),
     db.asset.groupBy({
@@ -135,7 +165,13 @@ export async function listCatalogAssets(viewer: SessionUser, p: AssetListParams)
     counts[row.category] = n;
     counts.ALL += n;
   }
-  return { items, total: p.category ? counts[p.category] : counts.ALL, counts };
+
+  let items: AssetCard[] = rows.map((r) => ({ ...r, match: interestsSet ? scoreMatch(r, interests) : null }));
+  if (bestMatch) {
+    const { skip, take } = toSkipTake(p.page, PAGE_SIZE.cards);
+    items = items.sort(compareByMatch).slice(skip, skip + take);
+  }
+  return { items, total: p.category ? counts[p.category] : counts.ALL, counts, hasInterests: interestsSet };
 }
 
 const assetDetailSelect = {
