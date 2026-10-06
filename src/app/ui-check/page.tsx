@@ -3,6 +3,7 @@
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/format";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -38,8 +39,8 @@ export default function UiCheckPage() {
       <div className="max-w-sm rounded-xl border bg-surface p-6">
         <p className="text-lg font-semibold">Bank in Poland</p>
         <p className="mt-1 text-sm text-text-muted">Asking price</p>
-        <div className="mt-2 rounded-lg bg-primary-soft px-4 py-3 text-lg font-semibold tabular-nums text-primary">
-          EUR 12,500,000
+        <div className="mt-2 rounded-lg border border-primary bg-primary-soft px-4 py-3 text-lg font-semibold tabular-nums text-primary">
+          {formatPrice(12_500_000)}
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <Badge>Default</Badge>
