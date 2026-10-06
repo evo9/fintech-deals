@@ -23,14 +23,22 @@ import { REASON_MAX } from "../schema";
 export function ReasonDialog({
   trigger,
   triggerLabel,
+  open: controlledOpen,
+  onOpenChange: setControlledOpen,
+  destructive,
   title,
   description,
   confirmLabel,
   successMessage,
   onConfirm,
 }: {
-  trigger: ReactElement;
-  triggerLabel: string;
+  /** Button that opens the dialog. Omit it and pass `open` / `onOpenChange` to open from a menu item. */
+  trigger?: ReactElement;
+  triggerLabel?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Confirm button in the danger color (Remove). */
+  destructive?: boolean;
   title: string;
   description: string;
   confirmLabel: string;
@@ -40,7 +48,9 @@ export function ReasonDialog({
   const router = useRouter();
   const fieldId = useId();
   const errorId = `${fieldId}-error`;
-  const [open, setOpen] = useState(false);
+  const [innerOpen, setInnerOpen] = useState(false);
+  const open = controlledOpen ?? innerOpen;
+  const setOpen = setControlledOpen ?? setInnerOpen;
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -77,7 +87,7 @@ export function ReasonDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger render={trigger}>{triggerLabel}</DialogTrigger>
+      {trigger && <DialogTrigger render={trigger}>{triggerLabel}</DialogTrigger>}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -103,7 +113,7 @@ export function ReasonDialog({
         </div>
         <DialogFooter>
           <DialogClose render={<Button type="button" variant="outline" disabled={pending} />}>Cancel</DialogClose>
-          <Button type="button" disabled={pending} onClick={submit}>
+          <Button type="button" variant={destructive ? "destructive" : "default"} disabled={pending} onClick={submit}>
             {confirmLabel}
           </Button>
         </DialogFooter>
