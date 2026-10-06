@@ -8,12 +8,16 @@
   --surface: #ffffff;
   --border: #e6e8ec;
   --text: #101828;
-  --text-muted: #6b7280;
+  --text-muted: #667085;
   --primary: #3d4af5;
   --primary-soft: #eef0ff;
   --success: #16a34a;
   --warning: #d97706;
   --danger: #dc2626;
+  /* darker shades for text on tinted backgrounds (AA contrast) */
+  --success-text: #166534;
+  --warning-text: #92400e;
+  --danger-text: #b91c1c;
   --role-buyer: #3d4af5;
   --role-seller: #16a34a;
   --role-manager: #7e22ce;
@@ -50,6 +54,9 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-success-text: var(--success-text);
+  --color-warning-text: var(--warning-text);
+  --color-danger-text: var(--danger-text);
   --color-role-buyer: var(--role-buyer);
   --color-role-seller: var(--role-seller);
   --color-role-manager: var(--role-manager);

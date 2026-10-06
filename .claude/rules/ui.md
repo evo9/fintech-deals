@@ -10,6 +10,7 @@ paths:
 
 - Colors only through theme tokens from `globals.css` (background, surface, border, text, text-muted, primary, primary-soft, success, warning, danger, role-*, ink). No raw hex in components.
 - Radius hierarchy: cards 20px, field tiles 12px, buttons/tabs/inputs/badges fully rounded (pill).
+- Active state: header navigation item = black pill (`bg-ink text-white`, as on n5deal.com). Tabs and segmented controls = white pill (`bg-surface`, `border-border`, `text-foreground`) on the muted track - never black. Hover must not change the text color of an active item.
 - Cards are separated by a border, not a shadow. Shadow only on the floating header and popovers/dialogs.
 - Font Inter via `next/font`. Prices, counters, numbers use `tabular-nums`; counters inside tabs have a fixed `min-w`.
 - Sentence case everywhere. No uppercase labels, no eyebrow labels above sections.
