@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { BadgeCheckIcon, ChevronRightIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CountryFlag } from "@/components/shared/country-flag";
 import { FieldTile } from "@/components/shared/field-tile";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -19,6 +18,7 @@ import { ContactSeller } from "@/features/messaging/components/contact-actions";
 import { MatchCriteria } from "@/features/matching/components/match-criteria";
 import { isShown, isStrongMatch, type MatchResult } from "@/features/matching/score";
 import type { AssetDetail } from "../queries";
+import { AssetModerationActions } from "@/features/moderation/components/asset-moderation";
 import { OwnerActions } from "./owner-actions";
 
 const NOT_SPECIFIED = "Not specified";
@@ -196,23 +196,11 @@ function OwnerActionsBlock({ asset, canManage, suspended }: { asset: AssetDetail
   );
 }
 
-// The manager buttons are placeholders with their final layout: wired in 7.1.
 function ManagerActions({ asset }: { asset: AssetDetail }) {
   return (
     <>
       <StatusBlock asset={asset} />
-      <div className="flex flex-col gap-2">
-        {asset.status === "PUBLISHED" && !asset.validatedAt && (
-          <Button type="button" disabled className="h-10">
-            Validate
-          </Button>
-        )}
-        {asset.status !== "REMOVED" && (
-          <Button type="button" variant="outline" disabled className="h-10">
-            Remove from listings
-          </Button>
-        )}
-      </div>
+      <AssetModerationActions id={asset.id} status={asset.status} validated={!!asset.validatedAt} />
     </>
   );
 }
