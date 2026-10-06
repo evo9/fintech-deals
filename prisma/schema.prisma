@@ -7,3 +7,184 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+enum Role {
+  BUYER
+  SELLER
+  MANAGER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  REMOVED
+}
+
+enum AssetCategory {
+  BANK
+  FINTECH
+  PAYMENT
+  EMI
+  CRYPTO
+}
+
+enum LicenseType {
+  BANKING
+  EMI
+  PI
+  SPI
+  PSP
+  CASP
+  VASP
+  MSB
+}
+
+enum AssetType {
+  ACTIVE_BUSINESS
+  LICENSE_ONLY
+  SHELF_COMPANY
+}
+
+enum BusinessStatus {
+  ACTIVE
+  NEVER_OPERATED
+  DORMANT
+}
+
+enum AssetStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  REMOVED
+}
+
+enum BuyerType {
+  STRATEGIC
+  FINANCIAL_INVESTOR
+  FAMILY_OFFICE
+  INDIVIDUAL
+}
+
+enum ModerationAction {
+  SUSPEND
+  RESTORE
+  REMOVE
+  REMOVE_ASSET
+  VALIDATE_ASSET
+}
+
+model User {
+  id              String     @id @default(cuid())
+  email           String     @unique // stored lower case
+  passwordHash    String
+  name            String
+  companyName     String?
+  country         String?
+  role            Role
+  status          UserStatus @default(ACTIVE)
+  statusReason    String?
+  statusChangedAt DateTime?
+  createdAt       DateTime   @default(now())
+
+  buyerProfile        BuyerProfile?
+  assets              Asset[]
+  buyerConversations  Conversation[]  @relation("ConversationBuyer")
+  sellerConversations Conversation[]  @relation("ConversationSeller")
+  messages            Message[]
+  moderationActions   ModerationLog[] @relation("ModerationManager")
+  moderationTargets   ModerationLog[] @relation("ModerationTargetUser")
+}
+
+model BuyerProfile {
+  userId       String          @id
+  user         User            @relation(fields: [userId], references: [id])
+  buyerType    BuyerType?
+  headline     String?         @db.VarChar(120)
+  about        String?         @db.VarChar(2000)
+  budgetMin    Int?
+  budgetMax    Int?
+  countries    String[]
+  licenseTypes LicenseType[]
+  categories   AssetCategory[]
+  assetTypes   AssetType[]
+  updatedAt    DateTime        @updatedAt
+}
+
+model Asset {
+  id             Int            @id @default(autoincrement())
+  sellerId       String
+  seller         User           @relation(fields: [sellerId], references: [id])
+  headline       String         @db.VarChar(90)
+  category       AssetCategory
+  licenseType    LicenseType
+  assetType      AssetType
+  businessStatus BusinessStatus
+  country        String
+  regulator      String
+  yearOfIssue    Int?
+  employees      Int?
+  askingPrice    Int? // whole euros; null = price on request
+  included       String[]
+  description    String         @db.VarChar(2000)
+  status         AssetStatus    @default(DRAFT)
+  publishedAt    DateTime?
+  validatedAt    DateTime?
+  removedReason  String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  conversations     Conversation[]
+  moderationEntries ModerationLog[]
+
+  @@index([status, category])
+  @@index([status, publishedAt])
+  @@index([sellerId])
+}
+
+model Conversation {
+  id               String    @id @default(cuid())
+  buyerId          String
+  buyer            User      @relation("ConversationBuyer", fields: [buyerId], references: [id])
+  sellerId         String
+  seller           User      @relation("ConversationSeller", fields: [sellerId], references: [id])
+  assetId          Int?
+  asset            Asset?    @relation(fields: [assetId], references: [id])
+  buyerLastReadAt  DateTime?
+  sellerLastReadAt DateTime?
+  createdAt        DateTime  @default(now())
+  lastMessageAt    DateTime  @default(now())
+
+  messages Message[]
+
+  // NULL assetId is not covered by this index: the null case is checked in code (findFirst in a transaction)
+  @@unique([buyerId, sellerId, assetId])
+  @@index([buyerId, lastMessageAt])
+  @@index([sellerId, lastMessageAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  body           String       @db.VarChar(2000)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model ModerationLog {
+  id            String           @id @default(cuid())
+  managerId     String
+  manager       User             @relation("ModerationManager", fields: [managerId], references: [id])
+  action        ModerationAction
+  targetUserId  String?
+  targetUser    User?            @relation("ModerationTargetUser", fields: [targetUserId], references: [id])
+  targetAssetId Int?
+  targetAsset   Asset?           @relation(fields: [targetAssetId], references: [id])
+  reason        String?
+  createdAt     DateTime         @default(now())
+
+  @@index([createdAt])
+}
