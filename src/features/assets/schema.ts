@@ -3,7 +3,7 @@ import { AssetCategory, AssetType, BusinessStatus, LicenseType } from "@prisma/c
 import { COUNTRIES, defaultRegulator } from "@/lib/reference";
 
 /** Multi-select values are comma-separated (`?country=MT,LT`); unknown values are dropped. */
-function csvOf<T extends string>(allowed: readonly T[]) {
+export function csvOf<T extends string>(allowed: readonly T[]) {
   const set = new Set<string>(allowed);
   return z
     .string()
@@ -16,7 +16,7 @@ const flag = z
   .transform((s) => s === "1")
   .catch(false);
 
-const euros = z
+export const euros = z
   .string()
   .regex(/^\d{1,9}$/)
   .transform(Number)
