@@ -38,6 +38,8 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
+const monthYearFormat = new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric", timeZone: "UTC" });
+
 const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -53,6 +55,11 @@ const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
 /** "6 Oct 2026" */
 export function formatDate(date: Date | string): string {
   return dateFormat.format(new Date(date));
+}
+
+/** "Jul 2026" */
+export function formatMonthYear(date: Date | string): string {
+  return monthYearFormat.format(new Date(date));
 }
 
 /** "6 Oct 2026, 14:05" (UTC) */

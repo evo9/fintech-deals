@@ -32,7 +32,7 @@ export default async function AssetsPage({ searchParams }: Props) {
           {items.length ? (
             <ul className="flex flex-col gap-4">
               {items.map((asset) => (
-                <AssetCard key={asset.id} asset={asset} />
+                <AssetCard key={asset.id} asset={asset} viewerSuspended={user.status === "SUSPENDED"} />
               ))}
             </ul>
           ) : (

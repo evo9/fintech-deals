@@ -1,0 +1,443 @@
+- generic [active] [ref=f11e1]:
+  - generic [ref=f11e2]:
+    - banner:
+      - generic [ref=f11e3]:
+        - link "FDeals" [ref=f11e4] [cursor=pointer]:
+          - /url: /assets
+        - generic [ref=f11e5]:
+          - button "Account menu, Lukas Weber" [ref=f11e6]
+          - button "Open menu" [ref=f11e7]
+    - main [ref=f11e9]:
+      - generic [ref=f11e11]:
+        - heading "Assets" [level=1] [ref=f11e12]
+        - generic [ref=f11e13]: Licensed fintech companies and licenses for sale
+      - generic [ref=f11e14]:
+        - generic [ref=f11e15]:
+          - searchbox "Search" [ref=f11e17]
+          - tablist "Category" [ref=f11e20]:
+            - tab "All 28" [selected] [ref=f11e21]:
+              - text: All
+              - generic [ref=f11e22]: "28"
+            - tab "Bank 3" [ref=f11e23]:
+              - text: Bank
+              - generic [ref=f11e24]: "3"
+            - tab "Fintech 3" [ref=f11e25]:
+              - text: Fintech
+              - generic [ref=f11e26]: "3"
+            - tab "Payment 9" [ref=f11e27]:
+              - text: Payment
+              - generic [ref=f11e28]: "9"
+            - tab "EMI 7" [ref=f11e29]:
+              - text: EMI
+              - generic [ref=f11e30]: "7"
+            - tab "Crypto 6" [ref=f11e31]:
+              - text: Crypto
+              - generic [ref=f11e32]: "6"
+        - generic [ref=f11e33]:
+          - paragraph [ref=f11e34]: 28 assets
+          - generic [ref=f11e35]:
+            - button "Filters" [ref=f11e36]
+            - combobox "Sort by" [ref=f11e37]:
+              - generic [ref=f11e38]: Newest
+              - img [aria-hidden]: ▼
+            - textbox [aria-hidden] [ref=f11e39]: newest
+      - list [ref=f11e41]:
+        - listitem [ref=f11e42]:
+          - generic [ref=f11e43]:
+            - generic [ref=f11e44]:
+              - paragraph [ref=f11e50]: "Asset ID #712"
+              - generic [ref=f11e51]: Validated
+            - heading "Lithuanian payment institution with SEPA and SWIFT access" [level=2] [ref=f11e55]
+            - generic [ref=f11e56]:
+              - generic [ref=f11e57]:
+                - paragraph [ref=f11e58]: Country
+                - paragraph [ref=f11e59]: Lithuania
+              - generic [ref=f11e60]:
+                - paragraph [ref=f11e61]: Type of license
+                - paragraph [ref=f11e62]: PI
+              - generic [ref=f11e63]:
+                - paragraph [ref=f11e64]: Type of business
+                - paragraph [ref=f11e65]: Payment
+              - generic [ref=f11e66]:
+                - paragraph [ref=f11e67]: Business status
+                - paragraph [ref=f11e68]: Active
+              - generic [ref=f11e69]:
+                - paragraph [ref=f11e70]: Asking price
+                - paragraph [ref=f11e71]: €4.6M
+            - generic [ref=f11e72]:
+              - generic [ref=f11e73]:
+                - generic [ref=f11e74]: "Asset type:"
+                - generic "Active business" [ref=f11e75]
+              - generic [ref=f11e76]:
+                - generic [ref=f11e77]: "Employees:"
+                - generic "21" [ref=f11e78]
+              - generic [ref=f11e79]:
+                - generic [ref=f11e80]: "Year:"
+                - generic "2017" [ref=f11e81]
+              - generic [ref=f11e82]:
+                - generic [ref=f11e83]: "Regulator:"
+                - generic "Bank of Lithuania" [ref=f11e84]
+            - generic [ref=f11e85]:
+              - generic [ref=f11e86]: Included
+              - list [ref=f11e87]:
+                - listitem "Operating licence" [ref=f11e88]
+                - listitem "Customer base" [ref=f11e89]
+                - listitem "Core platform and source code" [ref=f11e90]
+              - button "+1" [ref=f11e91]
+            - paragraph [ref=f11e92]: Direct SEPA participant with SWIFT connectivity and a diversified corporate client base. The compliance function is staffed and audited annually.
+            - generic [ref=f11e93]:
+              - paragraph [ref=f11e94]: Published Oct 2026
+              - generic [ref=f11e95]:
+                - 'link "View asset #712" [ref=f11e96] [cursor=pointer]':
+                  - /url: /assets/712
+                  - text: View asset
+                - button "Contact seller" [ref=f11e98]
+        - listitem [ref=f11e99]:
+          - generic [ref=f11e100]:
+            - generic [ref=f11e101]:
+              - paragraph [ref=f11e110]: "Asset ID #700"
+              - generic [ref=f11e111]: Validated
+            - heading "Maltese payment institution with a merchant acquiring portfolio" [level=2] [ref=f11e115]
+            - generic [ref=f11e116]:
+              - generic [ref=f11e117]:
+                - paragraph [ref=f11e118]: Country
+                - paragraph [ref=f11e119]: Malta
+              - generic [ref=f11e120]:
+                - paragraph [ref=f11e121]: Type of license
+                - paragraph [ref=f11e122]: PI
+              - generic [ref=f11e123]:
+                - paragraph [ref=f11e124]: Type of business
+                - paragraph [ref=f11e125]: Payment
+              - generic [ref=f11e126]:
+                - paragraph [ref=f11e127]: Business status
+                - paragraph [ref=f11e128]: Active
+              - generic [ref=f11e129]:
+                - paragraph [ref=f11e130]: Asking price
+                - paragraph [ref=f11e131]: €3.8M
+            - generic [ref=f11e132]:
+              - generic [ref=f11e133]:
+                - generic [ref=f11e134]: "Asset type:"
+                - generic "Active business" [ref=f11e135]
+              - generic [ref=f11e136]:
+                - generic [ref=f11e137]: "Employees:"
+                - generic "18" [ref=f11e138]
+              - generic [ref=f11e139]:
+                - generic [ref=f11e140]: "Year:"
+                - generic "2016" [ref=f11e141]
+              - generic [ref=f11e142]:
+                - generic [ref=f11e143]: "Regulator:"
+                - generic "MFSA" [ref=f11e144]
+            - generic [ref=f11e145]:
+              - generic [ref=f11e146]: Included
+              - list [ref=f11e147]:
+                - listitem "Operating licence" [ref=f11e148]
+                - listitem "Customer base" [ref=f11e149]
+            - paragraph [ref=f11e150]: Fully licensed payment institution with an established merchant acquiring book across Southern Europe. Clean regulatory history and an in-country compliance team.
+            - generic [ref=f11e151]:
+              - paragraph [ref=f11e152]: Published Oct 2026
+              - generic [ref=f11e153]:
+                - 'link "View asset #700" [ref=f11e154] [cursor=pointer]':
+                  - /url: /assets/700
+                  - text: View asset
+                - button "Contact seller" [ref=f11e156]
+        - listitem [ref=f11e157]:
+          - generic [ref=f11e158]:
+            - generic [ref=f11e159]:
+              - paragraph [ref=f11e165]: "Asset ID #724"
+              - generic [ref=f11e166]: Validated
+            - heading "Operating Georgian PSP and VASP platform with mobile wallet" [level=2] [ref=f11e170]
+            - generic [ref=f11e171]:
+              - generic [ref=f11e172]:
+                - paragraph [ref=f11e173]: Country
+                - paragraph [ref=f11e174]: Georgia
+              - generic [ref=f11e175]:
+                - paragraph [ref=f11e176]: Type of license
+                - paragraph [ref=f11e177]: PSP
+              - generic [ref=f11e178]:
+                - paragraph [ref=f11e179]: Type of business
+                - paragraph [ref=f11e180]: Payment
+              - generic [ref=f11e181]:
+                - paragraph [ref=f11e182]: Business status
+                - paragraph [ref=f11e183]: Active
+              - generic [ref=f11e184]:
+                - paragraph [ref=f11e185]: Asking price
+                - paragraph [ref=f11e186]: €2.75M
+            - generic [ref=f11e187]:
+              - generic [ref=f11e188]:
+                - generic [ref=f11e189]: "Asset type:"
+                - generic "Active business" [ref=f11e190]
+              - generic [ref=f11e191]:
+                - generic [ref=f11e192]: "Employees:"
+                - generic "34" [ref=f11e193]
+              - generic [ref=f11e194]:
+                - generic [ref=f11e195]: "Year:"
+                - generic "2019" [ref=f11e196]
+              - generic [ref=f11e197]:
+                - generic [ref=f11e198]: "Regulator:"
+                - generic "National Bank of Georgia" [ref=f11e199]
+            - generic [ref=f11e200]:
+              - generic [ref=f11e201]: Included
+              - list [ref=f11e202]:
+                - listitem "Operating licence" [ref=f11e203]
+                - listitem "Customer base" [ref=f11e204]
+                - listitem "Core platform and source code" [ref=f11e205]
+              - button "+3" [ref=f11e206]
+            - paragraph [ref=f11e207]: Operating Georgian PSP and VASP platform with a mobile wallet, proprietary QR and kiosk ecosystem. Over 200,000 registered users and own terminal network.
+            - generic [ref=f11e208]:
+              - paragraph [ref=f11e209]: Published Sept 2026
+              - generic [ref=f11e210]:
+                - 'link "View asset #724" [ref=f11e211] [cursor=pointer]':
+                  - /url: /assets/724
+                  - text: View asset
+                - button "Contact seller" [ref=f11e213]
+        - listitem [ref=f11e214]:
+          - generic [ref=f11e215]:
+            - generic [ref=f11e216]:
+              - paragraph [ref=f11e222]: "Asset ID #713"
+              - generic [ref=f11e223]: Validated
+            - heading "Vilnius EMI with a growing neobank customer base" [level=2] [ref=f11e227]
+            - generic [ref=f11e228]:
+              - generic [ref=f11e229]:
+                - paragraph [ref=f11e230]: Country
+                - paragraph [ref=f11e231]: Lithuania
+              - generic [ref=f11e232]:
+                - paragraph [ref=f11e233]: Type of license
+                - paragraph [ref=f11e234]: EMI
+              - generic [ref=f11e235]:
+                - paragraph [ref=f11e236]: Type of business
+                - paragraph [ref=f11e237]: EMI
+              - generic [ref=f11e238]:
+                - paragraph [ref=f11e239]: Business status
+                - paragraph [ref=f11e240]: Active
+              - generic [ref=f11e241]:
+                - paragraph [ref=f11e242]: Asking price
+                - paragraph [ref=f11e243]: €7.8M
+            - generic [ref=f11e244]:
+              - generic [ref=f11e245]:
+                - generic [ref=f11e246]: "Asset type:"
+                - generic "Active business" [ref=f11e247]
+              - generic [ref=f11e248]:
+                - generic [ref=f11e249]: "Employees:"
+                - generic "27" [ref=f11e250]
+              - generic [ref=f11e251]:
+                - generic [ref=f11e252]: "Year:"
+                - generic "2019" [ref=f11e253]
+              - generic [ref=f11e254]:
+                - generic [ref=f11e255]: "Regulator:"
+                - generic "Bank of Lithuania" [ref=f11e256]
+            - generic [ref=f11e257]:
+              - generic [ref=f11e258]: Included
+              - list [ref=f11e259]:
+                - listitem "Customer base" [ref=f11e260]
+                - listitem "Core platform and source code" [ref=f11e261]
+                - listitem "Compliance and risk team" [ref=f11e262]
+              - button "+2" [ref=f11e263]
+            - paragraph [ref=f11e264]: Licensed e-money institution with 40,000 retail accounts and a mobile app. Includes the app source code and the card issuing contract.
+            - generic [ref=f11e265]:
+              - paragraph [ref=f11e266]: Published Sept 2026
+              - generic [ref=f11e267]:
+                - 'link "View asset #713" [ref=f11e268] [cursor=pointer]':
+                  - /url: /assets/713
+                  - text: View asset
+                - button "Contact seller" [ref=f11e270]
+        - listitem [ref=f11e271]:
+          - generic [ref=f11e272]:
+            - generic [ref=f11e273]:
+              - paragraph [ref=f11e282]: "Asset ID #701"
+              - generic [ref=f11e283]: Validated
+            - heading "Malta EMI with prepaid card programme and BIN sponsorship" [level=2] [ref=f11e287]
+            - generic [ref=f11e288]:
+              - generic [ref=f11e289]:
+                - paragraph [ref=f11e290]: Country
+                - paragraph [ref=f11e291]: Malta
+              - generic [ref=f11e292]:
+                - paragraph [ref=f11e293]: Type of license
+                - paragraph [ref=f11e294]: EMI
+              - generic [ref=f11e295]:
+                - paragraph [ref=f11e296]: Type of business
+                - paragraph [ref=f11e297]: EMI
+              - generic [ref=f11e298]:
+                - paragraph [ref=f11e299]: Business status
+                - paragraph [ref=f11e300]: Active
+              - generic [ref=f11e301]:
+                - paragraph [ref=f11e302]: Asking price
+                - paragraph [ref=f11e303]: €9.5M
+            - generic [ref=f11e304]:
+              - generic [ref=f11e305]:
+                - generic [ref=f11e306]: "Asset type:"
+                - generic "Active business" [ref=f11e307]
+              - generic [ref=f11e308]:
+                - generic [ref=f11e309]: "Employees:"
+                - generic "32" [ref=f11e310]
+              - generic [ref=f11e311]:
+                - generic [ref=f11e312]: "Year:"
+                - generic "2018" [ref=f11e313]
+              - generic [ref=f11e314]:
+                - generic [ref=f11e315]: "Regulator:"
+                - generic "MFSA" [ref=f11e316]
+            - generic [ref=f11e317]:
+              - generic [ref=f11e318]: Included
+              - list [ref=f11e319]:
+                - listitem "Customer base" [ref=f11e320]
+                - listitem "Core platform and source code" [ref=f11e321]
+                - listitem "Compliance and risk team" [ref=f11e322]
+            - paragraph [ref=f11e323]: Operating electronic money institution issuing prepaid cards to SMEs. Includes principal scheme membership and an in-house card processing stack.
+            - generic [ref=f11e324]:
+              - paragraph [ref=f11e325]: Published Sept 2026
+              - generic [ref=f11e326]:
+                - 'link "View asset #701" [ref=f11e327] [cursor=pointer]':
+                  - /url: /assets/701
+                  - text: View asset
+                - button "Contact seller" [ref=f11e329]
+        - listitem [ref=f11e330]:
+          - generic [ref=f11e331]:
+            - paragraph [ref=f11e338]: "Asset ID #733"
+            - heading "Georgian e-money wallet with cash-in desks" [level=2] [ref=f11e339]
+            - generic [ref=f11e340]:
+              - generic [ref=f11e341]:
+                - paragraph [ref=f11e342]: Country
+                - paragraph [ref=f11e343]: Georgia
+              - generic [ref=f11e344]:
+                - paragraph [ref=f11e345]: Type of license
+                - paragraph [ref=f11e346]: EMI
+              - generic [ref=f11e347]:
+                - paragraph [ref=f11e348]: Type of business
+                - paragraph [ref=f11e349]: EMI
+              - generic [ref=f11e350]:
+                - paragraph [ref=f11e351]: Business status
+                - paragraph [ref=f11e352]: Active
+              - generic [ref=f11e353]:
+                - paragraph [ref=f11e354]: Asking price
+                - paragraph [ref=f11e355]: €2.3M
+            - generic [ref=f11e356]:
+              - generic [ref=f11e357]:
+                - generic [ref=f11e358]: "Asset type:"
+                - generic "Active business" [ref=f11e359]
+              - generic [ref=f11e360]:
+                - generic [ref=f11e361]: "Employees:"
+                - generic "17" [ref=f11e362]
+              - generic [ref=f11e363]:
+                - generic [ref=f11e364]: "Year:"
+                - generic "2021" [ref=f11e365]
+              - generic [ref=f11e366]:
+                - generic [ref=f11e367]: "Regulator:"
+                - generic "National Bank of Georgia" [ref=f11e368]
+            - generic [ref=f11e369]:
+              - generic [ref=f11e370]: Included
+              - list [ref=f11e371]:
+                - listitem "Compliance and risk team" [ref=f11e372]
+                - listitem "Banking relationships" [ref=f11e373]
+                - listitem "Audited financial statements" [ref=f11e374]
+              - button "+2" [ref=f11e375]
+            - paragraph [ref=f11e376]: E-money wallet with a network of cash-in desks and a corporate client list. Operates under a Georgian e-money issuer licence.
+            - generic [ref=f11e377]:
+              - paragraph [ref=f11e378]: Published Sept 2026
+              - generic [ref=f11e379]:
+                - 'link "View asset #733" [ref=f11e380] [cursor=pointer]':
+                  - /url: /assets/733
+                  - text: View asset
+                - button "Contact seller" [ref=f11e382]
+        - listitem [ref=f11e383]:
+          - generic [ref=f11e384]:
+            - paragraph [ref=f11e391]: "Asset ID #714"
+            - heading "Estonian payment services provider for online marketplaces" [level=2] [ref=f11e392]
+            - generic [ref=f11e393]:
+              - generic [ref=f11e394]:
+                - paragraph [ref=f11e395]: Country
+                - paragraph [ref=f11e396]: Estonia
+              - generic [ref=f11e397]:
+                - paragraph [ref=f11e398]: Type of license
+                - paragraph [ref=f11e399]: PSP
+              - generic [ref=f11e400]:
+                - paragraph [ref=f11e401]: Type of business
+                - paragraph [ref=f11e402]: Fintech
+              - generic [ref=f11e403]:
+                - paragraph [ref=f11e404]: Business status
+                - paragraph [ref=f11e405]: Active
+              - generic [ref=f11e406]:
+                - paragraph [ref=f11e407]: Asking price
+                - paragraph [ref=f11e408]: €1.35M
+            - generic [ref=f11e409]:
+              - generic [ref=f11e410]:
+                - generic [ref=f11e411]: "Asset type:"
+                - generic "Active business" [ref=f11e412]
+              - generic [ref=f11e413]:
+                - generic [ref=f11e414]: "Employees:"
+                - generic "8" [ref=f11e415]
+              - generic [ref=f11e416]:
+                - generic [ref=f11e417]: "Year:"
+                - generic "2018" [ref=f11e418]
+              - generic [ref=f11e419]:
+                - generic [ref=f11e420]: "Regulator:"
+                - generic "Finantsinspektsioon" [ref=f11e421]
+            - generic [ref=f11e422]:
+              - generic [ref=f11e423]: Included
+              - list [ref=f11e424]:
+                - listitem "Core platform and source code" [ref=f11e425]
+                - listitem "Compliance and risk team" [ref=f11e426]
+                - listitem "Banking relationships" [ref=f11e427]
+              - button "+3" [ref=f11e428]
+            - paragraph [ref=f11e429]: Compact PSP serving online marketplaces with split payments and escrow. Profitable for the last two years.
+            - generic [ref=f11e430]:
+              - paragraph [ref=f11e431]: Published Sept 2026
+              - generic [ref=f11e432]:
+                - 'link "View asset #714" [ref=f11e433] [cursor=pointer]':
+                  - /url: /assets/714
+                  - text: View asset
+                - button "Contact seller" [ref=f11e435]
+        - listitem [ref=f11e436]:
+          - generic [ref=f11e437]:
+            - paragraph [ref=f11e448]: "Asset ID #725"
+            - heading "Registered UK crypto asset firm with a trading app" [level=2] [ref=f11e449]
+            - generic [ref=f11e450]:
+              - generic [ref=f11e451]:
+                - paragraph [ref=f11e452]: Country
+                - paragraph [ref=f11e453]: United Kingdom
+              - generic [ref=f11e454]:
+                - paragraph [ref=f11e455]: Type of license
+                - paragraph [ref=f11e456]: VASP
+              - generic [ref=f11e457]:
+                - paragraph [ref=f11e458]: Type of business
+                - paragraph [ref=f11e459]: Crypto
+              - generic [ref=f11e460]:
+                - paragraph [ref=f11e461]: Business status
+                - paragraph [ref=f11e462]: Active
+              - generic [ref=f11e463]:
+                - paragraph [ref=f11e464]: Asking price
+                - paragraph [ref=f11e465]: €1.6M
+            - generic [ref=f11e466]:
+              - generic [ref=f11e467]:
+                - generic [ref=f11e468]: "Asset type:"
+                - generic "Active business" [ref=f11e469]
+              - generic [ref=f11e470]:
+                - generic [ref=f11e471]: "Employees:"
+                - generic "12" [ref=f11e472]
+              - generic [ref=f11e473]:
+                - generic [ref=f11e474]: "Year:"
+                - generic "2021" [ref=f11e475]
+              - generic [ref=f11e476]:
+                - generic [ref=f11e477]: "Regulator:"
+                - generic "FCA" [ref=f11e478]
+            - generic [ref=f11e479]:
+              - generic [ref=f11e480]: Included
+              - list [ref=f11e481]:
+                - listitem "Customer base" [ref=f11e482]
+                - listitem "Core platform and source code" [ref=f11e483]
+            - paragraph [ref=f11e484]: FCA-registered crypto asset business with a mobile trading app and a stable retail user base. Compliance officer and MLRO are part of the transfer.
+            - generic [ref=f11e485]:
+              - paragraph [ref=f11e486]: Published Sept 2026
+              - generic [ref=f11e487]:
+                - 'link "View asset #725" [ref=f11e488] [cursor=pointer]':
+                  - /url: /assets/725
+                  - text: View asset
+                - button "Contact seller" [ref=f11e490]
+      - navigation "Pagination" [ref=f11e491]:
+        - button "Previous page" [disabled]
+        - button "Page 1" [ref=f11e492]: "1"
+        - button "Page 2" [ref=f11e493]: "2"
+        - button "Page 3" [ref=f11e494]: "3"
+        - button "Page 4" [ref=f11e495]: "4"
+        - button "Next page" [ref=f11e496]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=f11e504] [cursor=pointer]
+  - alert [ref=f11e508]

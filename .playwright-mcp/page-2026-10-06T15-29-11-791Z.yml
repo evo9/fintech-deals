@@ -1,0 +1,14 @@
+- generic [active] [ref=f8e1]:
+  - generic [ref=f8e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=f8e7]
+    - generic [ref=f8e11]:
+      - button "Open issues overlay" [ref=f8e12]:
+        - generic [ref=f8e13]:
+          - generic [aria-hidden] [ref=f8e14]: "-1"
+          - generic [ref=f8e15]: "0"
+      - button "Collapse issues badge" [ref=f8e16]
+  - generic [ref=f8e20]:
+    - heading "This page couldn’t load" [level=1] [ref=f8e23]
+    - paragraph [ref=f8e24]: A server error occurred. Reload to try again.
+    - button "Reload" [ref=f8e27] [cursor=pointer]
+  - paragraph [ref=f8e28]: ERROR 3525594703

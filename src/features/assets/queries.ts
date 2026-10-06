@@ -106,21 +106,28 @@ export async function listCatalogAssets(viewer: SessionUser, p: AssetListParams)
     AND: p.category ? [...filters, { category: p.category }] : filters,
   });
 
-  // Interactive transaction: list and counters see one snapshot (groupBy loses its typing in an array transaction)
-  const [items, grouped] = await db.$transaction(async (tx) => [
-    await tx.asset.findMany({
+  // Array transaction (one round trip): an interactive one needs its own connection and times out on the pooler
+  const [items, grouped] = await db.$transaction([
+    db.asset.findMany({
       where: listWhere,
       orderBy: assetOrderBy(p.sort),
       ...toSkipTake(p.page, PAGE_SIZE.cards),
       select: assetCardSelect,
     }),
-    await tx.asset.groupBy({ by: ["category"], where: tabsWhere, _count: { _all: true }, orderBy: { category: "asc" } }),
-  ] as const);
+    db.asset.groupBy({
+      by: ["category"],
+      where: tabsWhere,
+      _count: { _all: true },
+      orderBy: { category: "asc" },
+    }),
+  ]);
 
   const counts: CategoryCounts = { ALL: 0, BANK: 0, FINTECH: 0, PAYMENT: 0, EMI: 0, CRYPTO: 0 };
   for (const row of grouped) {
-    counts[row.category] = row._count._all;
-    counts.ALL += row._count._all;
+    // Inside an array transaction Prisma types `_count` as `true | {...}`; with `_all` it is always the object
+    const n = typeof row._count === "object" ? (row._count._all ?? 0) : 0;
+    counts[row.category] = n;
+    counts.ALL += n;
   }
   return { items, total: p.category ? counts[p.category] : counts.ALL, counts };
 }
