@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState, type ReactNode } from "react";
 import type { AssetCategory, AssetType, BuyerType, LicenseType } from "@prisma/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,7 +80,7 @@ function Field({
   );
 }
 
-export function ProfileForm({ own, suspended }: { own: OwnProfile; suspended: boolean }) {
+export function ProfileForm({ own, suspended, visible }: { own: OwnProfile; suspended: boolean; visible: boolean }) {
   const [state, formAction, pending] = useActionState(saveProfile, null);
   const [clientErrors, setClientErrors] = useState<FieldErrors | null>(null);
   const [values, setValues] = useState<Values>(() => ({
@@ -282,6 +283,9 @@ export function ProfileForm({ own, suspended }: { own: OwnProfile; suspended: bo
       </div>
 
       <aside className="min-w-0 lg:sticky lg:top-24">
+        <div className="mb-4 hidden lg:block">
+          <VisibilityBadge visible={visible} />
+        </div>
         <h2 className="mb-1 text-lg font-semibold">Preview</h2>
         <p className="mb-3 text-sm text-text-muted">How sellers see your card in the buyers catalog.</p>
         <ul inert aria-label="Profile preview" className="pointer-events-none">
@@ -289,5 +293,14 @@ export function ProfileForm({ own, suspended }: { own: OwnProfile; suspended: bo
         </ul>
       </aside>
     </form>
+  );
+}
+
+/** Whether sellers can find this buyer (saved state). Shown in the page header on mobile, next to the preview on desktop. */
+export function VisibilityBadge({ visible }: { visible: boolean }) {
+  return visible ? (
+    <Badge variant="success">Profile visible to sellers</Badge>
+  ) : (
+    <Badge variant="warning">Hidden from sellers: add your interests</Badge>
   );
 }

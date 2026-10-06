@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ListBody, ListStateProvider } from "@/components/shared/list-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Pagination } from "@/components/shared/pagination";
+import { conversationsWithBuyers } from "@/features/messaging/queries";
 import { requireUser } from "@/features/auth/guards";
 import { BuyerCard } from "@/features/buyers/components/buyer-card";
 import { BuyerFilters } from "@/features/buyers/components/buyer-filters";
@@ -22,6 +23,8 @@ export default async function BuyersPage({ searchParams }: Props) {
   const user = await requireUser({ roles: ["SELLER"], allowSuspended: true, next: "/buyers" });
   const params = buyerListParams.parse(raw);
   const { items, total, myAssets, matchAsset } = await listCatalogBuyers(user, params);
+
+  const conversations = await conversationsWithBuyers(user.id, items.map((b) => b.id));
 
   const pages = totalPages(total, PAGE_SIZE.cards);
   if (params.page > pages) redirect(`/buyers?${withPage(raw, pages)}`.replace(/\?$/, ""));
@@ -42,7 +45,12 @@ export default async function BuyersPage({ searchParams }: Props) {
           {items.length ? (
             <ul className="flex flex-col gap-4">
               {items.map((buyer) => (
-                <BuyerCard key={buyer.id} buyer={buyer} viewerSuspended={user.status === "SUSPENDED"} />
+                <BuyerCard
+                  key={buyer.id}
+                  buyer={buyer}
+                  viewerSuspended={user.status === "SUSPENDED"}
+                  contact={{ assets: myAssets, existing: conversations.get(buyer.id) ?? [] }}
+                />
               ))}
             </ul>
           ) : (

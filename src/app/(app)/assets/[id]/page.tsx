@@ -4,6 +4,7 @@ import { AssetBreadcrumbs, AssetMain, AssetSidebar } from "@/features/assets/com
 import { getAssetForViewer } from "@/features/assets/queries";
 import { getBuyerInterests, topMatchingBuyers } from "@/features/buyers/queries";
 import { MatchingBuyers } from "@/features/assets/components/matching-buyers";
+import { conversationIdsByAsset } from "@/features/messaging/queries";
 import { hasInterests, scoreMatch } from "@/features/matching/score";
 import { formatAssetId } from "@/lib/format";
 
@@ -23,6 +24,8 @@ export default async function AssetPage({ params }: Props) {
   const asset = await getAssetForViewer(user, id);
   const interests = user.role === "BUYER" ? await getBuyerInterests(user.id) : null;
   const match = hasInterests(interests) ? scoreMatch(asset, interests) : null;
+  const conversationId =
+    user.role === "BUYER" ? ((await conversationIdsByAsset(user.id, [asset.id])).get(asset.id) ?? null) : null;
   const isOwner = user.role === "SELLER" && asset.sellerId === user.id;
   const matchingBuyers = isOwner && asset.status === "PUBLISHED" ? await topMatchingBuyers(user, asset) : null;
 
@@ -34,7 +37,7 @@ export default async function AssetPage({ params }: Props) {
           <AssetMain asset={asset} showStatus={user.role === "MANAGER" || asset.sellerId === user.id} />
           {matchingBuyers && <MatchingBuyers buyers={matchingBuyers} />}
         </div>
-        <AssetSidebar asset={asset} viewer={user} match={match} />
+        <AssetSidebar asset={asset} viewer={user} match={match} conversationId={conversationId} />
       </div>
     </main>
   );

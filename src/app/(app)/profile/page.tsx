@@ -1,8 +1,7 @@
-import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/shared/page-header";
 import { isProfileFilled } from "@/features/access/visibility";
 import { requireUser } from "@/features/auth/guards";
-import { ProfileForm } from "@/features/buyers/components/profile-form";
+import { ProfileForm, VisibilityBadge } from "@/features/buyers/components/profile-form";
 import { getOwnProfile } from "@/features/buyers/queries";
 
 export const metadata = { title: "My profile" };
@@ -18,14 +17,12 @@ export default async function ProfilePage() {
         title="My profile"
         description="Tell sellers what you are looking for"
         actions={
-          visible ? (
-            <Badge variant="success">Profile visible to sellers</Badge>
-          ) : (
-            <Badge variant="warning">Hidden from sellers: add your interests</Badge>
-          )
+          <div className="lg:hidden">
+            <VisibilityBadge visible={visible} />
+          </div>
         }
       />
-      <ProfileForm own={own} suspended={user.status === "SUSPENDED"} />
+      <ProfileForm own={own} suspended={user.status === "SUSPENDED"} visible={visible} />
     </main>
   );
 }
