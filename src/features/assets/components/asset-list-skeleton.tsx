@@ -15,28 +15,33 @@ import {
 
 function AssetCardSkeleton() {
   return (
-    <li className={CARD}>
-      <div className={CARD_FLAG_COLUMN}>
-        <Skeleton className="aspect-[3/2] w-[120px] rounded-[3px]" />
-      </div>
-      <div className={CARD_BODY}>
-        <div className={CARD_HEADER}>
-          <Skeleton className="h-5 w-32" />
+    <li className="@container">
+      <div className={CARD}>
+        <div className={CARD_FLAG_COLUMN}>
+          <Skeleton className="aspect-[3/2] w-[120px] rounded-[3px]" />
         </div>
-        <Skeleton className={`${CARD_HEADLINE} w-3/4`} />
-        <div className={CARD_TILES}>
-          {Array.from({ length: 5 }, (_, i) => (
-            <Skeleton key={i} className={i === 4 ? "col-span-2 h-[60px] rounded-lg lg:col-span-1" : "h-[60px] rounded-lg"} />
-          ))}
-        </div>
-        <Skeleton className="h-7 w-2/3 rounded-full" />
-        <Skeleton className={`${CARD_INCLUDED} w-1/2 rounded-full`} />
-        <Skeleton className={CARD_DESCRIPTION} />
-        <div className={CARD_FOOTER}>
-          <Skeleton className="h-5 w-28" />
-          <div className={CARD_BUTTONS}>
-            <Skeleton className="h-10 flex-1 rounded-full sm:w-32 sm:flex-none" />
-            <Skeleton className="h-10 flex-1 rounded-full sm:w-36 sm:flex-none" />
+        <div className={CARD_BODY}>
+          <div className={CARD_HEADER}>
+            <Skeleton className="h-5 w-32" />
+          </div>
+          <Skeleton className={`${CARD_HEADLINE} w-3/4`} />
+          <div className={CARD_TILES}>
+            {Array.from({ length: 5 }, (_, i) => (
+              <Skeleton
+                key={i}
+                className={i === 4 ? "col-span-2 h-[60px] rounded-lg @4xl:col-span-1" : "h-[60px] rounded-lg"}
+              />
+            ))}
+          </div>
+          <Skeleton className="h-7 w-2/3 rounded-full" />
+          <Skeleton className={`${CARD_INCLUDED} w-1/2 rounded-full`} />
+          <Skeleton className={CARD_DESCRIPTION} />
+          <div className={CARD_FOOTER}>
+            <Skeleton className="h-5 w-28" />
+            <div className={CARD_BUTTONS}>
+              <Skeleton className="h-10 flex-1 rounded-full @xl:w-32 @xl:flex-none" />
+              <Skeleton className="h-10 flex-1 rounded-full @xl:w-36 @xl:flex-none" />
+            </div>
           </div>
         </div>
       </div>

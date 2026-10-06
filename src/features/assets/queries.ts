@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
-import { Prisma, type AssetCategory } from "@prisma/client";
+import { Prisma, type AssetCategory, type AssetStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, toSkipTake } from "@/lib/pagination";
 import { COUNTRIES } from "@/lib/reference";
@@ -8,6 +8,7 @@ import {
   assetVisibilityWhere,
   canViewAsset,
   catalogAssetsWhere,
+  ownAssetsWhere,
   withVisibility,
 } from "@/features/access/visibility";
 import type { SessionUser } from "@/features/auth/session";
@@ -19,7 +20,7 @@ import {
   type BuyerInterests,
   type MatchResult,
 } from "@/features/matching/score";
-import type { AssetListParams } from "./schema";
+import type { AssetListParams, MyAssetsParams, MyAssetTab } from "./schema";
 
 const assetCardSelect = {
   id: true,
@@ -212,3 +213,74 @@ export const getAssetForViewer = cache(async (viewer: SessionUser, rawId: string
   if (!asset || !canViewAsset(viewer, asset)) notFound();
   return asset;
 });
+
+const myAssetSelect = {
+  id: true,
+  headline: true,
+  category: true,
+  askingPrice: true,
+  status: true,
+  updatedAt: true,
+  _count: { select: { conversations: true } },
+} satisfies Prisma.AssetSelect;
+
+export type MyAssetRow = Prisma.AssetGetPayload<{ select: typeof myAssetSelect }>;
+export type MyAssetCounts = Record<MyAssetTab, number>;
+
+/** "My assets" of a seller: own assets in every status, tab counters for all statuses. */
+export async function listOwnAssets(viewer: SessionUser, p: MyAssetsParams) {
+  if (viewer.role !== "SELLER") notFound();
+
+  const own = ownAssetsWhere(viewer);
+  const where = p.status === "ALL" ? own : withVisibility(own, { status: p.status as AssetStatus });
+
+  const [items, grouped] = await db.$transaction([
+    db.asset.findMany({
+      where,
+      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+      ...toSkipTake(p.page, PAGE_SIZE.rows),
+      select: myAssetSelect,
+    }),
+    db.asset.groupBy({ by: ["status"], where: own, _count: { _all: true }, orderBy: { status: "asc" } }),
+  ]);
+
+  const counts: MyAssetCounts = { ALL: 0, PUBLISHED: 0, DRAFT: 0, ARCHIVED: 0, REMOVED: 0 };
+  for (const row of grouped) {
+    const n = typeof row._count === "object" ? (row._count._all ?? 0) : 0;
+    counts[row.status] = n;
+    counts.ALL += n;
+  }
+  return { items, total: counts[p.status], counts };
+}
+
+const assetEditSelect = {
+  id: true,
+  sellerId: true,
+  headline: true,
+  category: true,
+  licenseType: true,
+  assetType: true,
+  businessStatus: true,
+  country: true,
+  regulator: true,
+  yearOfIssue: true,
+  employees: true,
+  askingPrice: true,
+  included: true,
+  description: true,
+  status: true,
+  removedReason: true,
+} satisfies Prisma.AssetSelect;
+
+export type AssetForEdit = Prisma.AssetGetPayload<{ select: typeof assetEditSelect }>;
+
+/** Asset for the edit form: only the owner's own asset (a REMOVED one is shown read-only); anything else is a 404. */
+export async function getOwnAssetForEdit(viewer: SessionUser, rawId: string): Promise<AssetForEdit> {
+  if (viewer.role !== "SELLER" || !/^\d{1,9}$/.test(rawId)) notFound();
+  const asset = await db.asset.findFirst({
+    where: withVisibility(ownAssetsWhere(viewer), { id: Number(rawId) }),
+    select: assetEditSelect,
+  });
+  if (!asset) notFound();
+  return asset;
+}
