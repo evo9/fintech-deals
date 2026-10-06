@@ -5,8 +5,9 @@ import { safeNextPath } from "@/features/auth/guards";
 import { listDemoAccounts } from "@/features/auth/queries";
 import { getSession } from "@/features/auth/session";
 import { LoginForm } from "@/features/auth/components/login-form";
+import { APP_NAME } from "@/lib/brand";
 
-export const metadata: Metadata = { title: "Log in - FintechDeeals" };
+export const metadata: Metadata = { title: `Log in - ${APP_NAME}` };
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -22,7 +23,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
   return (
     <main className="mx-auto w-full max-w-[1100px] px-4 py-12 md:py-16">
-      <p className="mb-8 text-2xl font-semibold">FintechDeeals</p>
+      <p className="mb-8 text-2xl font-semibold">{APP_NAME}</p>
       <LoginForm
         accounts={accounts}
         next={safeNextPath(first(params.next)) ?? undefined}

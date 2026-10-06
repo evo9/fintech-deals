@@ -10,6 +10,7 @@ import { login } from "../actions";
 import type { DemoAccount } from "../queries";
 import { formDataToLogin, loginSchema } from "../schema";
 import { DEMO_PASSWORD, DemoAccounts } from "./demo-accounts";
+import { APP_NAME } from "@/lib/brand";
 
 type FieldErrors = Record<string, string[] | undefined>;
 
@@ -96,7 +97,7 @@ export function LoginForm({
         </form>
 
         <p className="mt-6 text-sm text-text-muted">
-          New to FintechDeeals?{" "}
+          New to {APP_NAME}?{" "}
           <Link href="/register" className="font-semibold text-primary hover:underline">
             Create an account
           </Link>
