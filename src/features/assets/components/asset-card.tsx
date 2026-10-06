@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BadgeCheckIcon, EyeIcon } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { CountryFlag } from "@/components/shared/country-flag";
 import { FieldTile } from "@/components/shared/field-tile";
 import { formatAssetId, formatMonthYear, formatPrice } from "@/lib/format";
@@ -12,6 +12,7 @@ import {
   countryName,
 } from "@/lib/reference";
 import { cn } from "@/lib/utils";
+import { ContactSeller } from "@/features/messaging/components/contact-actions";
 import { MatchBadge } from "@/features/matching/components/match-badge";
 import type { AssetCard as AssetCardData } from "../queries";
 import {
@@ -40,7 +41,16 @@ function Chip({ label, value }: { label: string; value: string }) {
 }
 
 /** Catalog card (spec 7.3). */
-export function AssetCard({ asset, viewerSuspended }: { asset: AssetCardData; viewerSuspended: boolean }) {
+export function AssetCard({
+  asset,
+  viewerSuspended,
+  conversationId = null,
+}: {
+  asset: AssetCardData;
+  viewerSuspended: boolean;
+  /** The buyer's existing conversation about this asset: the button becomes "Open conversation". */
+  conversationId?: string | null;
+}) {
   const id = asset.id > 0 ? formatAssetId(asset.id) : "#new"; // the form preview has no id yet
 
   return (
@@ -117,15 +127,13 @@ export function AssetCard({ asset, viewerSuspended }: { asset: AssetCardData; vi
                 <EyeIcon aria-hidden />
                 View asset
               </Link>
-              {/* Not wired yet: the contact flow arrives with task 6.2 */}
-              <span
-                title={viewerSuspended ? "Your account is suspended" : undefined}
+              <ContactSeller
+                asset={{ id: asset.id, headline: asset.headline }}
+                suspended={viewerSuspended}
+                conversationId={conversationId}
                 className="flex flex-1 @xl:flex-none"
-              >
-                <Button type="button" disabled={viewerSuspended} className="h-10 flex-1 px-5 @xl:flex-none">
-                  Contact seller
-                </Button>
-              </span>
+                buttonClassName="flex-1 @xl:flex-none"
+              />
             </div>
           </div>
         </div>

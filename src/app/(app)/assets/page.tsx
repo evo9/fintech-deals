@@ -9,6 +9,7 @@ import { AssetCard } from "@/features/assets/components/asset-card";
 import { AssetFilters } from "@/features/assets/components/asset-filters";
 import { listCatalogAssets } from "@/features/assets/queries";
 import { assetListParams } from "@/features/assets/schema";
+import { conversationIdsByAsset } from "@/features/messaging/queries";
 import { requireUser } from "@/features/auth/guards";
 import { PAGE_SIZE, totalPages, withPage } from "@/lib/pagination";
 
@@ -19,6 +20,8 @@ export default async function AssetsPage({ searchParams }: Props) {
   const user = await requireUser({ roles: ["BUYER"], allowSuspended: true, next: "/assets" });
   const params = assetListParams.parse(raw);
   const { items, total, counts, hasInterests } = await listCatalogAssets(user, params);
+
+  const conversations = await conversationIdsByAsset(user.id, items.map((a) => a.id));
 
   const pages = totalPages(total, PAGE_SIZE.cards);
   if (params.page > pages) redirect(`/assets?${withPage(raw, pages)}`.replace(/\?$/, ""));
@@ -32,7 +35,12 @@ export default async function AssetsPage({ searchParams }: Props) {
           {items.length ? (
             <ul className="flex flex-col gap-4">
               {items.map((asset) => (
-                <AssetCard key={asset.id} asset={asset} viewerSuspended={user.status === "SUSPENDED"} />
+                <AssetCard
+                  key={asset.id}
+                  asset={asset}
+                  viewerSuspended={user.status === "SUSPENDED"}
+                  conversationId={conversations.get(asset.id) ?? null}
+                />
               ))}
             </ul>
           ) : (

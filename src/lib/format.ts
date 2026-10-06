@@ -62,6 +62,13 @@ export function formatMonthYear(date: Date | string): string {
   return monthYearFormat.format(new Date(date));
 }
 
+const timeFormat = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" });
+
+/** "14:05" (UTC, like every date here: server and browser render the same string) */
+export function formatTime(date: Date | string): string {
+  return timeFormat.format(new Date(date));
+}
+
 /** "6 Oct 2026, 14:05" (UTC) */
 export function formatDateTime(date: Date | string): string {
   return dateTimeFormat.format(new Date(date));

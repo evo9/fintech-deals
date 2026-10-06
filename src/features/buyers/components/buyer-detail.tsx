@@ -1,6 +1,8 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { CountryFlag } from "@/components/shared/country-flag";
+import { ContactBuyer } from "@/features/messaging/components/contact-actions";
+import { ContactDialog } from "@/features/messaging/components/contact-dialog";
+import type { PairConversation } from "@/features/messaging/queries";
 import { formatBudget, formatDate } from "@/lib/format";
 import {
   ASSET_CATEGORY_LABELS,
@@ -102,7 +104,17 @@ export function BuyerMain({ buyer }: { buyer: BuyerProfileView }) {
   );
 }
 
-export function BuyerSidebar({ buyer, viewerSuspended }: { buyer: BuyerProfileView; viewerSuspended: boolean }) {
+export function BuyerSidebar({
+  buyer,
+  viewerSuspended,
+  assets,
+  existing,
+}: {
+  buyer: BuyerProfileView;
+  viewerSuspended: boolean;
+  assets: { id: number; headline: string }[];
+  existing: PairConversation[];
+}) {
   const p = buyer.buyerProfile;
   const budget = formatBudget(p?.budgetMin, p?.budgetMax);
 
@@ -113,12 +125,26 @@ export function BuyerSidebar({ buyer, viewerSuspended }: { buyer: BuyerProfileVi
         <p className="text-2xl leading-8 font-semibold text-primary tabular-nums">{budget ?? "Not specified"}</p>
       </div>
       {p && <p className="text-sm text-text-muted">Profile updated {formatDate(p.updatedAt)}</p>}
-      {/* Not wired yet: the contact dialog arrives with task 6.2 */}
-      <span title={viewerSuspended ? "Your account is suspended" : undefined} className="flex">
-        <Button type="button" size="lg" disabled={viewerSuspended} className="h-11 flex-1">
-          Contact buyer
-        </Button>
-      </span>
+      <ContactBuyer
+        buyer={{ id: buyer.id, name: buyer.name }}
+        assets={assets}
+        existing={existing}
+        suspended={viewerSuspended}
+        className="flex"
+        buttonClassName="flex-1"
+        size="lg"
+      />
+      {existing.length > 0 && !viewerSuspended && assets.length > 0 && (
+        <ContactDialog
+          kind="buyer"
+          buyer={{ id: buyer.id, name: buyer.name }}
+          assets={assets}
+          existing={existing}
+          label="New message about another asset"
+          variant="outline"
+          className="h-10 w-full"
+        />
+      )}
     </aside>
   );
 }
