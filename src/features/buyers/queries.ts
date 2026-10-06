@@ -203,3 +203,40 @@ export async function getBuyerForSeller(viewer: SessionUser, rawId: string): Pro
   if (!buyer || !canViewBuyerProfile(viewer, buyer)) notFound();
   return buyer;
 }
+
+/** The buyer's own profile for the form; a missing row reads as an empty profile. */
+export async function getOwnProfile(viewer: SessionUser) {
+  if (viewer.role !== "BUYER") notFound();
+  const profile = await db.buyerProfile.findUnique({
+    where: { userId: viewer.id },
+    select: {
+      buyerType: true,
+      headline: true,
+      about: true,
+      countries: true,
+      licenseTypes: true,
+      categories: true,
+      assetTypes: true,
+      budgetMin: true,
+      budgetMax: true,
+    },
+  });
+  return {
+    name: viewer.name,
+    companyName: viewer.companyName,
+    country: viewer.country,
+    profile: profile ?? {
+      buyerType: null,
+      headline: null,
+      about: null,
+      countries: [],
+      licenseTypes: [],
+      categories: [],
+      assetTypes: [],
+      budgetMin: null,
+      budgetMax: null,
+    },
+  };
+}
+
+export type OwnProfile = Awaited<ReturnType<typeof getOwnProfile>>;

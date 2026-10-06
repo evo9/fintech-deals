@@ -15,6 +15,7 @@ import {
   LICENSE_TYPE_LABELS,
   countryName,
 } from "@/lib/reference";
+import { ContactSeller } from "@/features/messaging/components/contact-actions";
 import { MatchCriteria } from "@/features/matching/components/match-criteria";
 import { isShown, isStrongMatch, type MatchResult } from "@/features/matching/score";
 import type { AssetDetail } from "../queries";
@@ -111,10 +112,12 @@ export function AssetSidebar({
   asset,
   viewer,
   match,
+  conversationId,
 }: {
   asset: AssetDetail;
   viewer: SessionUser;
   match: MatchResult | null;
+  conversationId: string | null;
 }) {
   const isOwner = canManageOwnAsset(viewer, asset);
   const sellerName = asset.seller.companyName?.trim() || asset.seller.name;
@@ -138,7 +141,16 @@ export function AssetSidebar({
       </div>
 
       {viewer.role === "BUYER" && isShown(match) && <MatchBlock match={match} />}
-      {viewer.role === "BUYER" && <BuyerActions suspended={viewer.status === "SUSPENDED"} />}
+      {viewer.role === "BUYER" && (
+        <ContactSeller
+          asset={{ id: asset.id, headline: asset.headline }}
+          suspended={viewer.status === "SUSPENDED"}
+          conversationId={conversationId}
+          className="flex"
+          buttonClassName="flex-1"
+          size="lg"
+        />
+      )}
       {viewer.role === "SELLER" && asset.sellerId === viewer.id && <OwnerActionsBlock asset={asset} canManage={isOwner} suspended={viewer.status === "SUSPENDED"} />}
       {viewer.role === "MANAGER" && <ManagerActions asset={asset} />}
     </aside>
@@ -154,17 +166,6 @@ function MatchBlock({ match }: { match: MatchResult }) {
       </p>
       <MatchCriteria match={match} />
     </div>
-  );
-}
-
-function BuyerActions({ suspended }: { suspended: boolean }) {
-  return (
-    // Not wired yet: the contact dialog arrives with task 6.2
-    <span title={suspended ? "Your account is suspended" : undefined} className="flex">
-      <Button type="button" size="lg" disabled={suspended} className="h-11 flex-1">
-        Contact seller
-      </Button>
-    </span>
   );
 }
 

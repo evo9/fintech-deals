@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { EyeIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { CountryFlag } from "@/components/shared/country-flag";
+import { ContactBuyer } from "@/features/messaging/components/contact-actions";
+import type { PairConversation } from "@/features/messaging/queries";
 import { MatchBadge } from "@/features/matching/components/match-badge";
 import { formatBudget } from "@/lib/format";
 import { ASSET_CATEGORY_LABELS, BUYER_TYPE_LABELS, LICENSE_TYPE_LABELS, countryName } from "@/lib/reference";
@@ -12,8 +14,17 @@ import { BUYER_BUDGET, BUYER_CARD, BUYER_FOOTER, BUYER_HEAD, BUYER_HEADLINE, BUY
 
 const MAX_FLAGS = 6;
 
-/** Buyer card for sellers (spec 7.6). "Contact buyer" is wired with the messaging task (6.2). */
-export function BuyerCard({ buyer, viewerSuspended }: { buyer: BuyerCardData; viewerSuspended: boolean }) {
+/** Buyer card for sellers (spec 7.6). */
+export function BuyerCard({
+  buyer,
+  viewerSuspended,
+  contact,
+}: {
+  buyer: BuyerCardData;
+  viewerSuspended: boolean;
+  /** Own published assets to pick from and the conversations that already exist with this buyer. */
+  contact?: { assets: { id: number; headline: string }[]; existing: PairConversation[] };
+}) {
   const profile = buyer.buyerProfile;
   const budget = formatBudget(profile?.budgetMin, profile?.budgetMax);
   const countries = profile?.countries ?? [];
@@ -31,7 +42,10 @@ export function BuyerCard({ buyer, viewerSuspended }: { buyer: BuyerCardData; vi
         </div>
       </div>
 
-      <p className={cn(BUYER_HEADLINE, "truncate text-sm leading-6 text-foreground/80")} title={profile?.headline ?? undefined}>
+      <p
+        className={cn(BUYER_HEADLINE, "truncate text-sm leading-6 text-foreground/80")}
+        title={profile?.headline ?? undefined}
+      >
         {profile?.headline}
       </p>
 
@@ -64,17 +78,22 @@ export function BuyerCard({ buyer, viewerSuspended }: { buyer: BuyerCardData; vi
         <Link
           href={`/buyers/${buyer.id}`}
           aria-label={`View profile of ${buyer.name}`}
-          className={cn(buttonVariants({ variant: "outline" }), "h-10 flex-1 border-primary px-5 text-primary sm:flex-none")}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "h-10 flex-1 border-primary px-5 text-primary sm:flex-none",
+          )}
         >
           <EyeIcon aria-hidden />
           View profile
         </Link>
-        {/* Not wired yet: the contact flow arrives with task 6.2 */}
-        <span title={viewerSuspended ? "Your account is suspended" : undefined} className="flex flex-1 sm:flex-none">
-          <Button type="button" disabled={viewerSuspended} className="h-10 flex-1 px-5 sm:flex-none">
-            Contact buyer
-          </Button>
-        </span>
+        <ContactBuyer
+          buyer={{ id: buyer.id, name: buyer.name }}
+          assets={contact?.assets ?? []}
+          existing={contact?.existing ?? []}
+          suspended={viewerSuspended}
+          className="flex flex-1 sm:flex-none"
+          buttonClassName="flex-1 sm:flex-none"
+        />
       </div>
     </li>
   );
