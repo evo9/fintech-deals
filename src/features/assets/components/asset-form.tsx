@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useFocusFirstError } from "@/components/shared/use-focus-first-error";
 import {
   ASSET_CATEGORY_LABELS,
   ASSET_TYPE_LABELS,
@@ -200,6 +201,8 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
   const set = <K extends keyof Values>(key: K, value: Values[K]) => setValues((v) => ({ ...v, [key]: value }));
   const err = (key: string) => errors?.[key]?.[0];
 
+  useFocusFirstError(errors);
+
   // Browser warning when leaving with unsaved changes
   useEffect(() => {
     if (!dirty) return;
@@ -212,7 +215,7 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
   useEffect(() => {
     if (!state) return;
     if (!state.ok) {
-      if (!state.fieldErrors) toast.error(state.error);
+      if (!state.fieldErrors) toast.error(state.error); // field errors get their own toast above
       return;
     }
     const saved: SavedAsset = state.data;
@@ -461,6 +464,7 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
                 }
               }}
               placeholder="Mobile app"
+              aria-invalid={tagError || err("included") ? true : undefined}
               aria-describedby="included-error"
             />
             {values.included.map((tag) => (
