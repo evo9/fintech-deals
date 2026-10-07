@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MoreHorizontalIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -30,7 +31,8 @@ export function UserRowActions({
   const [dialog, setDialog] = useState<Dialog>(null);
   const [pending, startTransition] = useTransition();
 
-  if (role === "MANAGER" || status === "REMOVED") return null;
+  // Managers cannot be moderated and a removed user is final: both keep only View
+  const moderatable = role !== "MANAGER" && status !== "REMOVED";
 
   function restore() {
     startTransition(async () => {
@@ -55,11 +57,16 @@ export function UserRowActions({
           }
         />
         <DropdownMenuContent align="end" className="w-40">
-          {status === "ACTIVE" && <DropdownMenuItem onClick={() => setDialog("suspend")}>Suspend</DropdownMenuItem>}
-          {status === "SUSPENDED" && <DropdownMenuItem onClick={restore}>Restore</DropdownMenuItem>}
-          <DropdownMenuItem variant="destructive" onClick={() => setDialog("remove")}>
-            Remove
-          </DropdownMenuItem>
+          <DropdownMenuItem render={<Link href={`/admin/users/${id}`} />}>View</DropdownMenuItem>
+          {moderatable && status === "ACTIVE" && (
+            <DropdownMenuItem onClick={() => setDialog("suspend")}>Suspend</DropdownMenuItem>
+          )}
+          {moderatable && status === "SUSPENDED" && <DropdownMenuItem onClick={restore}>Restore</DropdownMenuItem>}
+          {moderatable && (
+            <DropdownMenuItem variant="destructive" onClick={() => setDialog("remove")}>
+              Remove
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 

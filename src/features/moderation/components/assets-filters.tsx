@@ -1,6 +1,7 @@
 "use client";
 
-import { FilterBar } from "@/components/shared/filter-bar";
+import { SearchInput } from "@/components/shared/filter-bar";
+import { Button } from "@/components/ui/button";
 import { useListState } from "@/components/shared/list-state";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ASSET_CATEGORY_LABELS, ASSET_STATUS_LABELS, COUNTRIES, toOptions } from "@/lib/reference";
@@ -31,7 +32,7 @@ function Filter({
   const { update } = useListState();
   return (
     <Select value={value ?? ALL} items={options} onValueChange={(v) => update({ [param]: v === ALL ? null : v })}>
-      <SelectTrigger aria-label={label} className="min-w-0 flex-1 sm:w-44 sm:flex-none">
+      <SelectTrigger aria-label={label} className="w-full min-w-0 sm:w-36 lg:w-44">
         <SelectValue />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger={false}>
@@ -45,7 +46,11 @@ function Filter({
   );
 }
 
-export function AssetsFilters({ params, total }: { params: AdminAssetsParams; total: number }) {
+const FILTER_KEYS = ["q", "status", "category", "country", "validated"];
+
+/** Search on the left, the four filters (and Clear filters) on the right; they wrap on a narrow screen. */
+export function AssetsFilters({ params }: { params: AdminAssetsParams }) {
+  const { update } = useListState();
   const hasActiveFilters =
     params.q !== "" ||
     params.status !== undefined ||
@@ -54,20 +59,23 @@ export function AssetsFilters({ params, total }: { params: AdminAssetsParams; to
     params.validated !== undefined;
 
   return (
-    <FilterBar
-      total={total}
-      singular="asset"
-      plural="assets"
-      filterKeys={["q", "status", "category", "country", "validated"]}
-      hasActiveFilters={hasActiveFilters}
-      search={{ initialQ: params.q, placeholder: "Search by ID, headline or regulator" }}
-    >
-      <div className="flex w-full flex-wrap gap-3 sm:ml-auto sm:w-auto sm:flex-nowrap">
+    <div className="flex flex-wrap items-center gap-3">
+      <SearchInput
+        initialQ={params.q}
+        placeholder="Search by ID, headline or regulator"
+        className="min-w-0 sm:max-w-[22.5rem]"
+      />
+      <div className="grid w-full grid-cols-2 items-center gap-3 sm:flex sm:flex-wrap lg:ml-auto lg:w-auto lg:flex-nowrap">
         <Filter label="Status" value={params.status} options={STATUS_OPTIONS} param="status" />
         <Filter label="Category" value={params.category} options={CATEGORY_OPTIONS} param="category" />
         <Filter label="Country" value={params.country} options={COUNTRY_OPTIONS} param="country" />
         <Filter label="Validation" value={params.validated} options={VALIDATED_OPTIONS} param="validated" />
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" className="col-span-2 sm:col-span-1" onClick={() => update(Object.fromEntries(FILTER_KEYS.map((k) => [k, null])))}>
+            Clear filters
+          </Button>
+        )}
       </div>
-    </FilterBar>
+    </div>
   );
 }

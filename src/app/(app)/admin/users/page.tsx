@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { UsersIcon } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { FilterBar } from "@/components/shared/filter-bar";
+import { SearchInput } from "@/components/shared/filter-bar";
 import { ListBody, ListStateProvider } from "@/components/shared/list-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Pagination } from "@/components/shared/pagination";
@@ -22,7 +22,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   const raw = await searchParams;
   const user = await requireUser({ roles: ["MANAGER"], allowSuspended: true, next: "/admin/users" });
   const params = adminUsersParams.parse(raw);
-  const { items, total, counts } = await listAdminUsers(user, params);
+  const { items, total, counts, tabTotal } = await listAdminUsers(user, params);
 
   const pages = totalPages(total, PAGE_SIZE.admin);
   if (params.page > pages) redirect(`/admin/users?${withPage(raw, pages)}`.replace(/\?$/, ""));
@@ -31,20 +31,24 @@ export default async function AdminUsersPage({ searchParams }: Props) {
 
   return (
     <main className="mx-auto w-full max-w-[1280px] px-4 py-8">
-      <PageHeader title="Participants" description="Buyers and sellers on the platform" />
+      <PageHeader title="Participants" description="Buyers and sellers on the platform" className="pb-4" />
       <ListStateProvider>
-        <UsersTabs value={params.tab} counts={counts} />
-        <div className="mt-4">
-          <FilterBar
-            total={total}
-            singular="participant"
-            plural="participants"
-            filterKeys={["q", "tab"]}
-            hasActiveFilters={filtered}
-            search={{ initialQ: params.q, placeholder: "Search by name, email or company" }}
+        <div className="flex flex-wrap items-center gap-3">
+          <SearchInput
+            initialQ={params.q}
+            placeholder="Search by name, email or company"
+            className="min-w-0 sm:max-w-[22.5rem]"
           />
+          <div className="w-full min-w-0 md:ml-auto md:w-auto">
+            <UsersTabs value={params.tab} counts={counts} />
+          </div>
         </div>
-        <ListBody className="mt-4">
+        <ListBody className="mt-3">
+          {params.q !== "" && (
+            <p aria-live="polite" className="mb-2 text-sm text-text-muted tabular-nums">
+              {total} of {tabTotal} {tabTotal === 1 ? "participant" : "participants"}
+            </p>
+          )}
           {items.length ? (
             <UsersTable items={items} />
           ) : (
