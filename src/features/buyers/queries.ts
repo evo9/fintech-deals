@@ -121,6 +121,7 @@ function buyerFilters(p: BuyerListParams): Prisma.UserWhereInput[] {
 export async function listCatalogBuyers(viewer: SessionUser, p: BuyerListParams) {
   if (viewer.role !== "SELLER") notFound();
 
+  // Contact dialog: only published assets can be the subject of a first message
   const ownPublished = withVisibility(ownAssetsWhere(viewer), { status: "PUBLISHED" });
   const myAssets = await db.asset.findMany({
     where: ownPublished,
@@ -128,14 +129,24 @@ export async function listCatalogBuyers(viewer: SessionUser, p: BuyerListParams)
     orderBy: { id: "desc" },
     take: 50,
   });
-  // an asset id that is not the seller's own (or not published) is simply ignored
-  const target = p.asset ? myAssets.find((a) => a.id === p.asset) : undefined;
-  const asset = target
+  // "Match buyers to your asset": own published assets and drafts (a draft can be tried before publishing)
+  const matchable = withVisibility(ownAssetsWhere(viewer), { status: { in: ["PUBLISHED", "DRAFT"] } });
+  const matchAssets = await db.asset.findMany({
+    where: matchable,
+    select: { id: true, headline: true },
+    orderBy: { id: "desc" },
+    take: 50,
+  });
+  // looked up on its own, not in the list above (capped at 50): an older own asset in ?asset= must still work.
+  // An id that is not the seller's own, or is withdrawn or removed, finds nothing and is ignored.
+  const found = p.asset
     ? await db.asset.findFirst({
-        where: withVisibility(ownPublished, { id: target.id }),
-        select: { country: true, licenseType: true, category: true, assetType: true, askingPrice: true },
+        where: withVisibility(matchable, { id: p.asset }),
+        select: { id: true, headline: true, country: true, licenseType: true, category: true, assetType: true, askingPrice: true },
       })
     : null;
+  const target = found ? { id: found.id, headline: found.headline } : undefined;
+  const asset = found;
 
   const where = withVisibility(catalogBuyersWhere, { AND: buyerFilters(p) });
   const score = (r: BuyerRow): BuyerCard => ({
@@ -150,7 +161,7 @@ export async function listCatalogBuyers(viewer: SessionUser, p: BuyerListParams)
       .map(score)
       .sort((a, b) => compareByMatch({ match: a.match, publishedAt: null, id: 0 }, { match: b.match, publishedAt: null, id: 0 }));
     const { skip, take } = toSkipTake(p.page, PAGE_SIZE.cards);
-    return { items: sorted.slice(skip, skip + take), total: rows.length, myAssets, matchAsset: target?.id };
+    return { items: sorted.slice(skip, skip + take), total: rows.length, myAssets, matchAssets, matchAsset: target };
   }
 
   const [rows, total] = await db.$transaction([
@@ -162,7 +173,7 @@ export async function listCatalogBuyers(viewer: SessionUser, p: BuyerListParams)
     }),
     db.user.count({ where }),
   ]);
-  return { items: rows.map(score), total, myAssets, matchAsset: undefined };
+  return { items: rows.map(score), total, myAssets, matchAssets, matchAsset: undefined };
 }
 
 const buyerProfileSelect = {

@@ -3,19 +3,16 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChipGroup, CountryChecklist, FilterFooter, FilterGroup, FilterPanel } from "@/components/shared/filter-panel";
 import { FilterBar } from "@/components/shared/filter-bar";
 import { useListState } from "@/components/shared/list-state";
 import { Button } from "@/components/ui/button";
-import { formatAssetId } from "@/lib/format";
 import { ASSET_CATEGORY_LABELS, BUYER_TYPE_LABELS, LICENSE_TYPE_LABELS } from "@/lib/reference";
 import { cn } from "@/lib/utils";
 import type { BuyerListParams } from "../schema";
 
 const PANEL_KEYS = ["type", "country", "licenseType", "category", "budgetMin", "budgetMax"];
-const ALL_KEYS = ["q", ...PANEL_KEYS, "asset"];
-const NONE = "none";
+const ALL_KEYS = ["q", ...PANEL_KEYS];
 
 function panelCount(p: BuyerListParams) {
   return (
@@ -30,20 +27,11 @@ function panelCount(p: BuyerListParams) {
 export function BuyerFilters({
   params,
   total,
-  myAssets,
-  matchAsset,
 }: {
   params: BuyerListParams;
   total: number;
-  myAssets: { id: number; headline: string }[];
-  matchAsset: number | undefined;
 }) {
-  const { update } = useListState();
   const activeInPanel = panelCount(params);
-  const matchItems = [
-    { value: NONE, label: "Match against: none" },
-    ...myAssets.map((a) => ({ value: String(a.id), label: `${formatAssetId(a.id)} ${a.headline}` })),
-  ];
 
   return (
     <FilterBar
@@ -51,34 +39,13 @@ export function BuyerFilters({
       singular="buyer"
       plural="buyers"
       filterKeys={ALL_KEYS}
-      hasActiveFilters={activeInPanel > 0 || params.q !== "" || matchAsset !== undefined}
+      hasActiveFilters={activeInPanel > 0 || params.q !== ""}
       search={{ initialQ: params.q, placeholder: "Find a buyer..." }}
       controls={
         <>
           <FilterPanel activeCount={activeInPanel} description="Narrow down the buyer list">
             {({ done, className }) => <FiltersForm params={params} onDone={done} className={className} />}
           </FilterPanel>
-          {myAssets.length > 0 && (
-            <Select
-              value={matchAsset !== undefined ? String(matchAsset) : NONE}
-              items={matchItems}
-              onValueChange={(v) => update({ asset: v === NONE ? null : String(v) })}
-            >
-              <SelectTrigger
-                aria-label="Match against one of your assets"
-                className="min-w-0 flex-1 sm:w-64 sm:flex-none"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent alignItemWithTrigger={false} align="end" className="min-w-72">
-                {matchItems.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>
-                    {o.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
         </>
       }
     />

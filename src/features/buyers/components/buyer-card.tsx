@@ -32,7 +32,7 @@ export function BuyerCard({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {profile?.buyerType && <Badge variant="outline">{BUYER_TYPE_LABELS[profile.buyerType]}</Badge>}
-          <MatchBadge match={buyer.match} />
+          <MatchBadge match={buyer.match} title="Buyer's interests" />
         </div>
       </div>
 

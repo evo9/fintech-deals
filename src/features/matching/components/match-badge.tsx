@@ -6,7 +6,7 @@ import { isShown, isStrongMatch, type MatchResult } from "../score";
 import { MatchCriteria } from "./match-criteria";
 
 /** "Matches 4 of 5" or a green "Strong match"; hover or focus lists which criteria matched. */
-export function MatchBadge({ match }: { match: MatchResult | null }) {
+export function MatchBadge({ match, title = "Your interests" }: { match: MatchResult | null; title?: string }) {
   if (!isShown(match)) return null;
   const strong = isStrongMatch(match);
 
@@ -18,7 +18,7 @@ export function MatchBadge({ match }: { match: MatchResult | null }) {
         </Badge>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="flex-col items-start p-3 text-sm">
-        <p className="font-medium">Your interests</p>
+        <p className="font-medium">{title}</p>
         <MatchCriteria match={match} />
       </TooltipContent>
     </Tooltip>

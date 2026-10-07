@@ -12,9 +12,9 @@ export function BuyerListSkeleton() {
         </div>
         <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
           <Skeleton className="h-10 w-[7.5rem] shrink-0 rounded-full" />
-          <Skeleton className="h-10 min-w-0 flex-1 rounded-full sm:w-64 sm:flex-none" />
         </div>
       </div>
+      <Skeleton className="mt-4 h-[94px] rounded-xl sm:h-[66px]" />
       <ul className="mt-4 flex flex-col gap-4">
         {Array.from({ length: PAGE_SIZE.cards }, (_, i) => (
           <li key={i} className={BUYER_CARD}>

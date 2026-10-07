@@ -11,6 +11,7 @@ import { requireUser } from "@/features/auth/guards";
 import { BuyerCard } from "@/features/buyers/components/buyer-card";
 import { BuyerCardActions } from "@/features/buyers/components/buyer-card-actions";
 import { BuyerFilters } from "@/features/buyers/components/buyer-filters";
+import { BuyerMatchPanel } from "@/features/buyers/components/buyer-match-panel";
 import { listCatalogBuyers } from "@/features/buyers/queries";
 import { buyerListParams } from "@/features/buyers/schema";
 import { PAGE_SIZE, totalPages, withPage } from "@/lib/pagination";
@@ -23,7 +24,7 @@ export default async function BuyersPage({ searchParams }: Props) {
   const raw = await searchParams;
   const user = await requireUser({ roles: ["SELLER"], allowSuspended: true, next: "/buyers" });
   const params = buyerListParams.parse(raw);
-  const { items, total, myAssets, matchAsset } = await listCatalogBuyers(user, params);
+  const { items, total, myAssets, matchAssets, matchAsset } = await listCatalogBuyers(user, params);
 
   const conversations = await conversationsWithBuyers(user.id, items.map((b) => b.id));
 
@@ -32,7 +33,6 @@ export default async function BuyersPage({ searchParams }: Props) {
 
   const filtered =
     params.q !== "" ||
-    matchAsset !== undefined ||
     params.type.length + params.country.length + params.licenseType.length + params.category.length > 0 ||
     params.budgetMin !== undefined ||
     params.budgetMax !== undefined;
@@ -41,7 +41,8 @@ export default async function BuyersPage({ searchParams }: Props) {
     <main className="mx-auto w-full max-w-[1280px] px-4 py-8">
       <PageHeader title="Buyers" description="Buyers who have described what they are looking for" />
       <ListStateProvider>
-        <BuyerFilters params={params} total={total} myAssets={myAssets} matchAsset={matchAsset} />
+        <BuyerFilters params={params} total={total} />
+        <BuyerMatchPanel assets={matchAssets} selected={matchAsset} />
         <ListBody className="mt-4">
           {items.length ? (
             <ul className="flex flex-col gap-4">
@@ -69,7 +70,7 @@ export default async function BuyersPage({ searchParams }: Props) {
                   : "Buyers appear here once they describe their interests in their profile."
               }
             >
-              <Link href={filtered ? "/buyers" : "/my-assets"} className={buttonVariants({ variant: "secondary" })}>
+              <Link href={filtered ? (matchAsset ? `/buyers?asset=${matchAsset.id}` : "/buyers") : "/my-assets"} className={buttonVariants({ variant: "secondary" })}>
                 {filtered ? "Clear filters" : "Go to my assets"}
               </Link>
             </EmptyState>
