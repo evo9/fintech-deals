@@ -12,7 +12,7 @@ export default function Loading() {
           <Skeleton className="h-[420px] rounded-xl" />
           <Skeleton className="h-[560px] rounded-xl" />
         </div>
-        <Skeleton className="hidden h-[340px] rounded-xl lg:block" />
+        <Skeleton className="hidden h-[292px] rounded-xl lg:block" />
       </div>
     </main>
   );

@@ -19,11 +19,14 @@ export function BuyerCard({
   buyer,
   viewerSuspended,
   contact,
+  preview = false,
 }: {
   buyer: BuyerCardData;
   viewerSuspended: boolean;
   /** Own published assets to pick from and the conversations that already exist with this buyer. */
   contact?: { assets: { id: number; headline: string }[]; existing: PairConversation[] };
+  /** The buyer's own preview on /profile: the same card without the seller's actions. */
+  preview?: boolean;
 }) {
   const profile = buyer.buyerProfile;
   const budget = formatBudget(profile?.budgetMin, profile?.budgetMax);
@@ -74,27 +77,29 @@ export function BuyerCard({
         Budget: <span className="font-semibold text-foreground tabular-nums">{budget ?? "not specified"}</span>
       </p>
 
-      <div className={BUYER_FOOTER}>
-        <Link
-          href={`/buyers/${buyer.id}`}
-          aria-label={`View profile of ${buyer.name}`}
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "h-10 flex-1 border-primary px-5 text-primary sm:flex-none",
-          )}
-        >
-          <EyeIcon aria-hidden />
-          View profile
-        </Link>
-        <ContactBuyer
-          buyer={{ id: buyer.id, name: buyer.name }}
-          assets={contact?.assets ?? []}
-          existing={contact?.existing ?? []}
-          suspended={viewerSuspended}
-          className="flex flex-1 sm:flex-none"
-          buttonClassName="flex-1 sm:flex-none"
-        />
-      </div>
+      {!preview && (
+        <div className={BUYER_FOOTER}>
+          <Link
+            href={`/buyers/${buyer.id}`}
+            aria-label={`View profile of ${buyer.name}`}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-10 flex-1 border-primary px-5 text-primary sm:flex-none",
+            )}
+          >
+            <EyeIcon aria-hidden />
+            View profile
+          </Link>
+          <ContactBuyer
+            buyer={{ id: buyer.id, name: buyer.name }}
+            assets={contact?.assets ?? []}
+            existing={contact?.existing ?? []}
+            suspended={viewerSuspended}
+            className="flex flex-1 sm:flex-none"
+            buttonClassName="flex-1 sm:flex-none"
+          />
+        </div>
+      )}
     </li>
   );
 }
