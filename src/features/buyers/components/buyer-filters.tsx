@@ -25,20 +25,18 @@ function panelCount(p: BuyerListParams) {
   );
 }
 
-/** One row: the search box takes the free width, Filters sits on its right. */
+/** One row: the search box has the same width as on the other lists, Filters is pinned to the right edge. */
 export function BuyerFilters({ params }: { params: BuyerListParams }) {
   const activeInPanel = panelCount(params);
 
   return (
     <div className="flex items-center gap-3">
-      <SearchInput
-        initialQ={params.q}
-        placeholder="Find a buyer..."
-        className="min-w-0 flex-1 sm:max-w-none"
-      />
-      <FilterPanel activeCount={activeInPanel} description="Narrow down the buyer list" compactOnMobile>
-        {({ done, className }) => <FiltersForm params={params} onDone={done} className={className} />}
-      </FilterPanel>
+      <SearchInput initialQ={params.q} placeholder="Find a buyer..." className="min-w-0" />
+      <div className="ml-auto flex shrink-0">
+        <FilterPanel activeCount={activeInPanel} description="Narrow down the buyer list" compactOnMobile>
+          {({ done, className }) => <FiltersForm params={params} onDone={done} className={className} />}
+        </FilterPanel>
+      </div>
     </div>
   );
 }

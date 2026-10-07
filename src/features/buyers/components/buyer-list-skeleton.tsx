@@ -6,8 +6,8 @@ export function BuyerListSkeleton() {
   return (
     <div aria-busy aria-label="Loading buyers">
       <div className="flex items-center gap-3">
-        <Skeleton className="h-10 min-w-0 flex-1 rounded-full" />
-        <Skeleton className="size-10 shrink-0 rounded-full md:w-[7.5rem]" />
+        <Skeleton className="h-10 min-w-0 flex-1 rounded-full sm:max-w-sm" />
+        <Skeleton className="ml-auto size-10 shrink-0 rounded-full md:w-[7.5rem]" />
       </div>
       <Skeleton className="mt-3 h-[134px] rounded-xl md:h-[66px]" />
       <ul className="mt-3 flex flex-col gap-4">
