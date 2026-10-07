@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { BadgeCheckIcon, EyeIcon } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
+import type { ReactNode } from "react";
+import { BadgeCheckIcon } from "lucide-react";
 import { CountryFlag } from "@/components/shared/country-flag";
 import { FieldTile } from "@/components/shared/field-tile";
 import { formatAssetId, formatMonthYear, formatPrice } from "@/lib/format";
@@ -12,7 +11,6 @@ import {
   countryName,
 } from "@/lib/reference";
 import { cn } from "@/lib/utils";
-import { ContactSeller } from "@/features/messaging/components/contact-actions";
 import { MatchBadge } from "@/features/matching/components/match-badge";
 import type { AssetCard as AssetCardData } from "../queries";
 import {
@@ -43,13 +41,11 @@ function Chip({ label, value }: { label: string; value: string }) {
 /** Catalog card (spec 7.3). */
 export function AssetCard({
   asset,
-  viewerSuspended,
-  conversationId = null,
+  actions,
 }: {
   asset: AssetCardData;
-  viewerSuspended: boolean;
-  /** The buyer's existing conversation about this asset: the button becomes "Open conversation". */
-  conversationId?: string | null;
+  /** Buttons of the catalog (View, Contact). Omitted in the form preview: then the footer has no buttons at all. */
+  actions?: ReactNode;
 }) {
   const id = asset.id > 0 ? formatAssetId(asset.id) : "#new"; // the form preview has no id yet
 
@@ -111,31 +107,14 @@ export function AssetCard({
             {asset.description}
           </p>
 
-          <div className={CARD_FOOTER}>
-            <p className="min-h-5 text-sm text-text-muted">
-              {asset.publishedAt ? `Published ${formatMonthYear(asset.publishedAt)}` : ""}
-            </p>
-            <div className={CARD_BUTTONS}>
-              <Link
-                href={`/assets/${asset.id}`}
-                aria-label={`View asset ${id}`}
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "h-10 flex-1 border-primary px-5 text-primary @xl:flex-none",
-                )}
-              >
-                <EyeIcon aria-hidden />
-                View asset
-              </Link>
-              <ContactSeller
-                asset={{ id: asset.id, headline: asset.headline }}
-                suspended={viewerSuspended}
-                conversationId={conversationId}
-                className="flex flex-1 @xl:flex-none"
-                buttonClassName="flex-1 @xl:flex-none"
-              />
+          {(asset.publishedAt || actions) && (
+            <div className={CARD_FOOTER}>
+              <p className="min-h-5 text-sm text-text-muted">
+                {asset.publishedAt ? `Published ${formatMonthYear(asset.publishedAt)}` : ""}
+              </p>
+              {actions && <div className={CARD_BUTTONS}>{actions}</div>}
             </div>
-          </div>
+          )}
         </div>
       </div>
     </li>

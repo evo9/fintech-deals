@@ -21,7 +21,7 @@ export default async function AdminAssetsPage({ searchParams }: Props) {
   const raw = await searchParams;
   const user = await requireUser({ roles: ["MANAGER"], allowSuspended: true, next: "/admin/assets" });
   const params = adminAssetsParams.parse(raw);
-  const { items, total } = await listAdminAssets(user, params);
+  const { items, total, filterTotal } = await listAdminAssets(user, params);
 
   const pages = totalPages(total, PAGE_SIZE.admin);
   if (params.page > pages) redirect(`/admin/assets?${withPage(raw, pages)}`.replace(/\?$/, ""));
@@ -35,10 +35,15 @@ export default async function AdminAssetsPage({ searchParams }: Props) {
 
   return (
     <main className="mx-auto w-full max-w-[1280px] px-4 py-8">
-      <PageHeader title="Assets" description="All assets in every status" />
+      <PageHeader title="Assets" description="All assets in every status" className="pb-4" />
       <ListStateProvider>
-        <AssetsFilters params={params} total={total} />
-        <ListBody className="mt-4">
+        <AssetsFilters params={params} />
+        <ListBody className="mt-3">
+          {params.q !== "" && (
+            <p aria-live="polite" className="mb-2 text-sm text-text-muted tabular-nums">
+              {total} of {filterTotal} {filterTotal === 1 ? "asset" : "assets"}
+            </p>
+          )}
           {items.length ? (
             <AssetsTable items={items} />
           ) : (

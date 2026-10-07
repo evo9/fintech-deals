@@ -103,9 +103,11 @@
   html {
     @apply font-sans;
     color-scheme: light; /* no dark theme: the OS preference must not recolor scrollbars and controls */
+    overscroll-behavior-y: none; /* no rubber band: the sticky header must not bounce with the page */
   }
   body {
     @apply bg-background text-foreground antialiased;
+    overscroll-behavior-y: none;
   }
 }
 

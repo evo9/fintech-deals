@@ -289,7 +289,7 @@ export function ProfileForm({ own, suspended, visible }: { own: OwnProfile; susp
         <h2 className="mb-1 text-lg font-semibold">Preview</h2>
         <p className="mb-3 text-sm text-text-muted">How sellers see your card in the buyers catalog.</p>
         <ul inert aria-label="Profile preview" className="pointer-events-none">
-          <BuyerCard buyer={preview} viewerSuspended={false} />
+          <BuyerCard buyer={preview} />
         </ul>
       </aside>
     </form>

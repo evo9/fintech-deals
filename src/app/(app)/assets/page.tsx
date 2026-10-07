@@ -6,6 +6,7 @@ import { ListBody, ListStateProvider } from "@/components/shared/list-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Pagination } from "@/components/shared/pagination";
 import { AssetCard } from "@/features/assets/components/asset-card";
+import { AssetCardActions } from "@/features/assets/components/asset-card-actions";
 import { AssetFilters } from "@/features/assets/components/asset-filters";
 import { listCatalogAssets } from "@/features/assets/queries";
 import { assetListParams } from "@/features/assets/schema";
@@ -38,8 +39,13 @@ export default async function AssetsPage({ searchParams }: Props) {
                 <AssetCard
                   key={asset.id}
                   asset={asset}
-                  viewerSuspended={user.status === "SUSPENDED"}
-                  conversationId={conversations.get(asset.id) ?? null}
+                  actions={
+                    <AssetCardActions
+                      asset={asset}
+                      viewerSuspended={user.status === "SUSPENDED"}
+                      conversationId={conversations.get(asset.id) ?? null}
+                    />
+                  }
                 />
               ))}
             </ul>

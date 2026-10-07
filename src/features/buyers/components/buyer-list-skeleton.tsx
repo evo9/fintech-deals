@@ -5,17 +5,12 @@ import { BUYER_BUDGET, BUYER_CARD, BUYER_FOOTER, BUYER_HEAD, BUYER_HEADLINE, BUY
 export function BuyerListSkeleton() {
   return (
     <div aria-busy aria-label="Loading buyers">
-      <Skeleton className="h-10 w-full rounded-full sm:max-w-sm" />
-      <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 sm:h-10 sm:flex-nowrap">
-        <div className="flex h-9 items-center">
-          <Skeleton className="h-5 w-20" />
-        </div>
-        <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
-          <Skeleton className="h-10 w-[7.5rem] shrink-0 rounded-full" />
-          <Skeleton className="h-10 min-w-0 flex-1 rounded-full sm:w-64 sm:flex-none" />
-        </div>
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-10 min-w-0 flex-1 rounded-full sm:max-w-sm" />
+        <Skeleton className="ml-auto size-10 shrink-0 rounded-full md:w-[7.5rem]" />
       </div>
-      <ul className="mt-4 flex flex-col gap-4">
+      <Skeleton className="mt-3 h-[134px] rounded-xl md:h-[66px]" />
+      <ul className="mt-3 flex flex-col gap-4">
         {Array.from({ length: PAGE_SIZE.cards }, (_, i) => (
           <li key={i} className={BUYER_CARD}>
             <div className={BUYER_HEAD}>

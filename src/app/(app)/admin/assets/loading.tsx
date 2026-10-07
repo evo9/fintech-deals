@@ -4,7 +4,7 @@ import { AssetsSkeleton } from "@/features/moderation/components/assets-skeleton
 export default function Loading() {
   return (
     <main className="mx-auto w-full max-w-[1280px] px-4 py-8">
-      <PageHeader title="Assets" description="All assets in every status" />
+      <PageHeader title="Assets" description="All assets in every status" className="pb-4" />
       <AssetsSkeleton />
     </main>
   );

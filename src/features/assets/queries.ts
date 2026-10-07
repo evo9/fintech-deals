@@ -269,6 +269,7 @@ const assetEditSelect = {
   included: true,
   description: true,
   status: true,
+  publishedAt: true,
   removedReason: true,
 } satisfies Prisma.AssetSelect;
 

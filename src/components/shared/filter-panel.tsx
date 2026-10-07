@@ -24,10 +24,13 @@ export function toggle<T>(list: T[], value: T): T[] {
 export function FilterPanel({
   activeCount,
   description,
+  compactOnMobile = false,
   children,
 }: {
   activeCount: number;
   description: string;
+  /** Mobile trigger shows only the icon (the name stays in aria-label); the desktop button is unchanged. */
+  compactOnMobile?: boolean;
   children: (panel: { done: () => void; mobile: boolean; className: string }) => ReactNode;
 }) {
   const [desktopOpen, setDesktopOpen] = useState(false);
@@ -35,7 +38,7 @@ export function FilterPanel({
   const label = (
     <>
       <SlidersHorizontalIcon aria-hidden />
-      Filters
+      <span className={cn(compactOnMobile && "sr-only md:not-sr-only")}>Filters</span>
       {activeCount > 0 && (
         <span className="ml-0.5 inline-flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground tabular-nums">
           {activeCount}
@@ -58,7 +61,17 @@ export function FilterPanel({
       </Popover>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetTrigger render={<Button variant="outline" className="shrink-0 md:hidden" />}>{label}</SheetTrigger>
+        <SheetTrigger
+          render={
+            <Button
+              variant="outline"
+              aria-label={compactOnMobile ? "Filters" : undefined}
+              className={cn("shrink-0 md:hidden", compactOnMobile && "h-10 min-w-10 px-3")}
+            />
+          }
+        >
+          {label}
+        </SheetTrigger>
         <SheetContent side="right" className="gap-0 p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-sm">
           <SheetHeader className="border-b">
             <SheetTitle>Filters</SheetTitle>
