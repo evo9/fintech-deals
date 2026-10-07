@@ -36,12 +36,14 @@ export function BuyerCard({
         </div>
       </div>
 
-      <p
-        className={cn(BUYER_HEADLINE, "truncate text-sm leading-6 text-foreground/80")}
-        title={profile?.headline ?? undefined}
-      >
-        {profile?.headline}
-      </p>
+      {profile?.headline && (
+        <p
+          className={cn(BUYER_HEADLINE, "truncate text-sm leading-6 text-foreground/80")}
+          title={profile.headline}
+        >
+          {profile.headline}
+        </p>
+      )}
 
       <div className={BUYER_TAGS}>
         {countries.slice(0, MAX_FLAGS).map((code) => (

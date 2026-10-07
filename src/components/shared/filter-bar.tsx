@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useListState } from "./list-state";
 
 /** Search box: updates the URL 300 ms after the last keystroke, no submit button. */
@@ -11,10 +12,12 @@ export function SearchInput({
   initialQ,
   placeholder,
   label = "Search",
+  className,
 }: {
   initialQ: string;
   placeholder: string;
   label?: string;
+  className?: string;
 }) {
   const { update, pending } = useListState();
   const [q, setQ] = useState(initialQ);
@@ -39,7 +42,7 @@ export function SearchInput({
   }, [q, initialQ, update]);
 
   return (
-    <div className="relative w-full sm:max-w-sm">
+    <div className={cn("relative w-full sm:max-w-sm", className)}>
       <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-text-muted" />
       <Input
         type="search"

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChipGroup, CountryChecklist, FilterFooter, FilterGroup, FilterPanel } from "@/components/shared/filter-panel";
-import { FilterBar } from "@/components/shared/filter-bar";
+import { SearchInput } from "@/components/shared/filter-bar";
 import { useListState } from "@/components/shared/list-state";
 import { Button } from "@/components/ui/button";
 import { ASSET_CATEGORY_LABELS, BUYER_TYPE_LABELS, LICENSE_TYPE_LABELS } from "@/lib/reference";
@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils";
 import type { BuyerListParams } from "../schema";
 
 const PANEL_KEYS = ["type", "country", "licenseType", "category", "budgetMin", "budgetMax"];
-const ALL_KEYS = ["q", ...PANEL_KEYS];
+/** URL keys reset by "Clear filters" (the match asset has its own reset). */
+export const BUYER_FILTER_KEYS = ["q", ...PANEL_KEYS];
 
 function panelCount(p: BuyerListParams) {
   return (
@@ -24,31 +25,21 @@ function panelCount(p: BuyerListParams) {
   );
 }
 
-export function BuyerFilters({
-  params,
-  total,
-}: {
-  params: BuyerListParams;
-  total: number;
-}) {
+/** One row: the search box takes the free width, Filters sits on its right. */
+export function BuyerFilters({ params }: { params: BuyerListParams }) {
   const activeInPanel = panelCount(params);
 
   return (
-    <FilterBar
-      total={total}
-      singular="buyer"
-      plural="buyers"
-      filterKeys={ALL_KEYS}
-      hasActiveFilters={activeInPanel > 0 || params.q !== ""}
-      search={{ initialQ: params.q, placeholder: "Find a buyer..." }}
-      controls={
-        <>
-          <FilterPanel activeCount={activeInPanel} description="Narrow down the buyer list">
-            {({ done, className }) => <FiltersForm params={params} onDone={done} className={className} />}
-          </FilterPanel>
-        </>
-      }
-    />
+    <div className="flex items-center gap-3">
+      <SearchInput
+        initialQ={params.q}
+        placeholder="Find a buyer..."
+        className="min-w-0 flex-1 sm:max-w-none"
+      />
+      <FilterPanel activeCount={activeInPanel} description="Narrow down the buyer list" compactOnMobile>
+        {({ done, className }) => <FiltersForm params={params} onDone={done} className={className} />}
+      </FilterPanel>
+    </div>
   );
 }
 

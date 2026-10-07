@@ -39,11 +39,11 @@ export default async function BuyersPage({ searchParams }: Props) {
 
   return (
     <main className="mx-auto w-full max-w-[1280px] px-4 py-8">
-      <PageHeader title="Buyers" description="Buyers who have described what they are looking for" />
+      <PageHeader title="Buyers" description="Buyers who have described what they are looking for" className="pb-4" />
       <ListStateProvider>
-        <BuyerFilters params={params} total={total} />
-        <BuyerMatchPanel assets={matchAssets} selected={matchAsset} />
-        <ListBody className="mt-4">
+        <BuyerFilters params={params} />
+        <BuyerMatchPanel assets={matchAssets} selected={matchAsset} total={total} hasActiveFilters={filtered} />
+        <ListBody className="mt-3">
           {items.length ? (
             <ul className="flex flex-col gap-4">
               {items.map((buyer) => (
