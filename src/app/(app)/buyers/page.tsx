@@ -9,6 +9,7 @@ import { Pagination } from "@/components/shared/pagination";
 import { conversationsWithBuyers } from "@/features/messaging/queries";
 import { requireUser } from "@/features/auth/guards";
 import { BuyerCard } from "@/features/buyers/components/buyer-card";
+import { BuyerCardActions } from "@/features/buyers/components/buyer-card-actions";
 import { BuyerFilters } from "@/features/buyers/components/buyer-filters";
 import { listCatalogBuyers } from "@/features/buyers/queries";
 import { buyerListParams } from "@/features/buyers/schema";
@@ -48,8 +49,13 @@ export default async function BuyersPage({ searchParams }: Props) {
                 <BuyerCard
                   key={buyer.id}
                   buyer={buyer}
-                  viewerSuspended={user.status === "SUSPENDED"}
-                  contact={{ assets: myAssets, existing: conversations.get(buyer.id) ?? [] }}
+                  actions={
+                    <BuyerCardActions
+                      buyer={buyer}
+                      viewerSuspended={user.status === "SUSPENDED"}
+                      contact={{ assets: myAssets, existing: conversations.get(buyer.id) ?? [] }}
+                    />
+                  }
                 />
               ))}
             </ul>

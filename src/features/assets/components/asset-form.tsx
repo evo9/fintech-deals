@@ -281,7 +281,8 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
         askingPrice: values.priceOnRequest || !/^\d+$/.test(values.askingPrice) ? null : Number(values.askingPrice),
         included: values.included,
         description: values.description.trim() || "Your description will appear here.",
-        publishedAt: new Date(),
+        // only a published asset has a publication date: a new asset and a draft show none
+        publishedAt: editing && asset.status === "PUBLISHED" ? asset.publishedAt : null,
         validatedAt: null,
         match: null,
       }
@@ -546,7 +547,7 @@ export function AssetForm({ asset, suspended }: { asset?: AssetForEdit; suspende
         {preview ? (
           // inert: the preview shows the card as buyers see it, its buttons must not react
           <ul inert aria-label="Card preview" className="pointer-events-none">
-            <AssetCard asset={preview} viewerSuspended={false} />
+            <AssetCard asset={preview} />
           </ul>
         ) : (
           <div className="flex h-[338px] items-center justify-center rounded-xl border border-dashed bg-surface px-6 text-center text-sm text-text-muted">
