@@ -24,3 +24,4 @@ npm-debug.log*
 files/
 .claude/settings.local.json
 .playwright-mcp/
+.claude/scheduled_tasks.lock
